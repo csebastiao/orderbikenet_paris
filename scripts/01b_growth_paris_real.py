@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+"""
+Plot the AUC in additive order of all strategies on the tested graphs.
+"""
+
+
+import os
+import json
+import networkx as nx
+import osmnx as ox
+from orderbike.metrics import directness, coverage, relative_directness
+
+
+BUFF_SIZE = 400
+FOLDEROOTS = "./data/processed/paris_simplified_results/"
+TIMESTAMPS = [
+    "2021-01-01",
+    "2023-05-17",
+    "2023-10-01",
+    "2024-01-15",
+    "2024-04-04",
+    "2024-08-22",
+    "2024-12-22",
+    "2025-06-02",
+    "No",
+]
+
+#FIXME relative directness not working currently
+
+def main():
+    # With and without exponential discounting
+    G = ox.load_graphml(FOLDEROOTS + "paris_cleaned_multigraph.graphml")
+    closeness = nx.closeness_centrality(G, distance="length")
+    edge_closeness = {}
+    for edge in G.edges:
+        edge_closeness[edge] = (closeness[edge[0]] + closeness[edge[1]]) / 2
+    init_edge = [tuple(max(edge_closeness, key=edge_closeness.get))]
+    G_init = G.edge_subgraph(init_edge)
+    tot_length = [sum([G_init.edges[e]["length"] for e in G_init.edges])]
+    dir_real = [directness(G_init)]
+    cov_real = [coverage(G_init, BUFF_SIZE)]
+    reldir_real = [0] #[relative_directness(G_init, G)]
+    num_ccs = [nx.number_connected_components(G_init)]
+    length_lcc = [sum([G_init.edges[e]["length"] for e in G_init.edges])]
+    for i in range(len(TIMESTAMPS)):
+        H = G.edge_subgraph([e for e in G.edges if G.edges[e]["built"] in TIMESTAMPS[:i+1]])
+        tot_length.append(sum([H.edges[e]["length"] for e in H.edges]))
+        dir_real.append(directness(H))
+        cov_real.append(coverage(H, BUFF_SIZE))
+        reldir_real.append(0) #reldir_real.append(relative_directness(H, G))
+        cc = list(nx.connected_components(H))
+        num_ccs.append(len(cc))
+        length_lcc.append(
+            max(
+                [
+                    sum(
+                        [H.edges[e]["length"] for e in H.subgraph(comp).edges]
+                    )
+                    for comp in cc
+                ]
+            )
+        )
+    for idx, t in enumerate(TIMESTAMPS):
+        met_dict = {}
+        met_dict["xx"] = tot_length[idx:]
+        met_dict["coverage"] = cov_real[idx:]
+        met_dict["directness"] = dir_real[idx:]
+        met_dict["relative_directness"] = reldir_real[idx:]
+        met_dict["num_cc"] = num_ccs[idx:]
+        met_dict["length_lcc"] = length_lcc[idx:]
+        foldertime = FOLDEROOTS + f"/{t}/real"
+        if not os.path.exists(foldertime):
+            os.makedirs(foldertime)
+        with open(foldertime + "/metrics_growth.json", "w") as f:
+            json.dump(met_dict, f)
+
+if __name__ == "__main__":
+    main()

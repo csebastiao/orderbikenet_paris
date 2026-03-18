@@ -10,9 +10,13 @@ import networkx as nx
 import osmnx as ox
 
 
-if __name__ == "__main__":
+GPKG_PATH = "./data/raw/paris_en_selle_map_updates/cleaned.gpkg"
+SAVEPATH = "./data/processed/paris_simplified_results/"
+
+
+def main():
     # Read the GeoPackage manually made from QGIS
-    gdf = gpd.read_file("./data/raw/paris_en_selle_map_updates/cleaned.gpkg")
+    gdf = gpd.read_file(GPKG_PATH)
     if "fid" in gdf.columns:
         gdf = gdf.drop(columns=["fid"])
     gdf_ls = gdf.copy()
@@ -30,7 +34,7 @@ if __name__ == "__main__":
     H = nx.convert_node_labels_to_integers(H)
     for e in H.edges:
         if H.edges[e]["2023-05-17 Etat"] in "Réalisé Pré-2021":
-            H.edges[e]["built"] = "2021 and before"
+            H.edges[e]["built"] = "2021-01-01"
         elif H.edges[e]["2023-05-17 Etat"] in ["Réalisé dans le Plan Vélo", "Annoncé réalisé", "Hors Plan Vélo (Embellir)"]:
             H.edges[e]["built"] = "2023-05-17"
         elif H.edges[e]["2023-10-01 Etat"] in ["Réalisé dans le Plan Vélo", "Annoncé réalisé", "Hors Plan Vélo (Embellir)"]:
@@ -51,15 +55,19 @@ if __name__ == "__main__":
     H = ox.simplify_graph(H, edge_attrs_differ=["built"])
     ox.save_graphml(
         H,
-        filepath="./data/processed/paris_cleaned_multidigraph.graphml",
+        filepath=SAVEPATH + "paris_cleaned_multidigraph.graphml",
     )
     nx.set_edge_attributes(H, 0, "osmid")
     H = ox.convert.to_undirected(H)
     ox.save_graphml(
         H,
-        filepath="./data/processed/paris_cleaned_multigraph.graphml",
+        filepath=SAVEPATH + "paris_cleaned_multigraph.graphml",
     )
     ox.save_graph_geopackage(
         H,
-        filepath="./data/processed/paris_cleaned_multigraph.gpkg",
+        filepath=SAVEPATH + "paris_cleaned_multigraph.gpkg",
     )
+
+
+if __name__ == "__main__":
+   main()

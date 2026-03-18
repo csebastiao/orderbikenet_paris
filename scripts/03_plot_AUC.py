@@ -4,37 +4,28 @@ Plot the AUC in additive order of all strategies on the tested graphs.
 """
 
 import os
+import json
 import pandas as pd
 import matplotlib as mpl
 from matplotlib import pyplot as plt
-import json
 import numpy as np
 
 
-def is_pareto_efficient(x, df, fdim, sdim):
-    return ~np.any(df[(df[fdim] > x[fdim]) & (df[sdim] > x[sdim])])
-
-
-def average_x(df):
-    arr = []
-    for ind in set(df.index):
-        arr.append(df[df.index == ind].mean())
-    return arr
-
 FOLDEROOTS = "./data/processed/paris_simplified_results/"
+TIMESTAMPS = [
+    "2021-01-01",
+    "2023-05-17",
+    "2023-10-01",
+    "2024-01-15",
+    "2024-04-04",
+    "2024-08-22",
+    "2024-12-22",
+    "2025-06-02",
+    "No",
+]
 
-if __name__ == "__main__":
-    timestamps = [
-        "2021 and before",
-        "2023-05-17",
-        "2023-10-01",
-        "2024-01-15",
-        "2024-04-04",
-        "2024-08-22",
-        "2024-12-22",
-        "2025-06-02",
-        "No",
-    ]
+
+def main():
     with open("./scripts/03_plot_params_AUC.json", "r") as f:
         plot_params = json.load(f)
     for key in plot_params["rcparams"]:
@@ -48,7 +39,7 @@ if __name__ == "__main__":
             savename += "_expdisc"
         savename += ".json"
         df_growth = pd.read_json(savename)
-        for t in timestamps:
+        for t in TIMESTAMPS:
             mask_tim = df_growth["Timestamp"] == t
             fig, ax = plt.subplots(figsize=plot_params["figsize"])
             for ids, met in enumerate(plot_params["order"]):
@@ -135,6 +126,20 @@ if __name__ == "__main__":
             plt.legend(
                 prop={"size": plot_params["rcparams"]["font.size"] * 0.75}
             )
-            # savename += "_hc.png"
             plt.savefig(savename)
             plt.close()
+
+
+def is_pareto_efficient(x, df, fdim, sdim):
+    return ~np.any(df[(df[fdim] > x[fdim]) & (df[sdim] > x[sdim])])
+
+
+def average_x(df):
+    arr = []
+    for ind in set(df.index):
+        arr.append(df[df.index == ind].mean())
+    return arr
+
+
+if __name__ == "__main__":
+    main()
