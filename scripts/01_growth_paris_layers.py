@@ -34,7 +34,7 @@ if __name__ == "__main__":
         # "2024-08-22",
         # "2024-12-22",
         # "2025-06-02",
-        "Nothing",
+        "No",
     ]
     for idx, built_val in enumerate(timestamps):
         foldertime = folderoots + "/" + built_val
@@ -44,7 +44,7 @@ if __name__ == "__main__":
                     f"Start computation for timestamp {built_val}"
                 )
         H = G.copy()
-        if built_val == "Nothing":
+        if built_val == "No":
             BUILT = False
         else:
             BUILT = True
