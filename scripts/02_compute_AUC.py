@@ -60,6 +60,7 @@ def main():
                             normalize_y=True,
                             yaxis_method="natural",
                             exp_discounting=exp_disc,
+                            normalize_max_auc=False,
                         )
                         auc_dir = auc_from_metrics_dict(
                             met_dict,
@@ -67,6 +68,7 @@ def main():
                             normalize_y=False,
                             max_comparison_y="one",
                             exp_discounting=exp_disc,
+                            normalize_max_auc=False,
                         )
                         timestamp_aucs.append(
                             [t, metric, i, auc_cov, auc_dir]
@@ -80,6 +82,7 @@ def main():
                         normalize_y=True,
                         yaxis_method="natural",
                         exp_discounting=exp_disc,
+                        normalize_max_auc=False,
                     )
                     auc_dir = auc_from_metrics_dict(
                         met_dict,
@@ -87,6 +90,7 @@ def main():
                         normalize_y=False,
                         max_comparison_y="one",
                         exp_discounting=exp_disc,
+                        normalize_max_auc=False,
                     )
                     timestamp_aucs.append(
                         [t, metric, 0, auc_cov, auc_dir]

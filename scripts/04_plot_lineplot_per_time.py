@@ -62,7 +62,7 @@ def main():
                 yy = "directness"
                 ax.set_ylabel("Directness")
                 ratio = 1
-            for ids, met in enumerate(plot_params["order"][:7]):
+            for ids, met in enumerate(plot_params["order"]):
                 df = avg[met]
                 ax.plot(
                     df["xx"] / 10**3,

@@ -60,19 +60,31 @@ def main():
                 ]
             )
         )
-    for idx, t in enumerate(TIMESTAMPS):
+    for idx, t in enumerate(TIMESTAMPS[:-1]):
         met_dict = {}
-        met_dict["xx"] = tot_length[idx:]
-        met_dict["coverage"] = cov_real[idx:]
-        met_dict["directness"] = dir_real[idx:]
-        met_dict["relative_directness"] = reldir_real[idx:]
-        met_dict["num_cc"] = num_ccs[idx:]
-        met_dict["length_lcc"] = length_lcc[idx:]
+        met_dict["xx"] = tot_length[idx+1:]
+        met_dict["coverage"] = cov_real[idx+1:]
+        met_dict["directness"] = dir_real[idx+1:]
+        met_dict["relative_directness"] = reldir_real[idx+1:]
+        met_dict["num_cc"] = num_ccs[idx+1:]
+        met_dict["length_lcc"] = length_lcc[idx+1:]
         foldertime = FOLDEROOTS + f"/{t}/real"
         if not os.path.exists(foldertime):
             os.makedirs(foldertime)
         with open(foldertime + "/metrics_growth.json", "w") as f:
             json.dump(met_dict, f)
+    met_dict = {}
+    met_dict["xx"] = tot_length
+    met_dict["coverage"] = cov_real
+    met_dict["directness"] = dir_real
+    met_dict["relative_directness"] = reldir_real
+    met_dict["num_cc"] = num_ccs
+    met_dict["length_lcc"] = length_lcc
+    foldertime = FOLDEROOTS + "/No/real"
+    if not os.path.exists(foldertime):
+        os.makedirs(foldertime)
+    with open(foldertime + "/metrics_growth.json", "w") as f:
+        json.dump(met_dict, f)
 
 if __name__ == "__main__":
     main()
