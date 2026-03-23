@@ -7,12 +7,12 @@ Plot the metrics as a hedgehog graph, where we add at timestamp the new optimize
 import os
 import json
 import pandas as pd
+import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 
 FOLDEROOTS = "./data/processed/paris_simplified_results/"
-RAND_TRIAL_NUMBER = 50
 TIMESTAMPS = [
     "2021-01-01",
     "2023-05-17",
@@ -31,53 +31,63 @@ def main():
         plot_params = json.load(f)
     for key in plot_params["rcparams"]:
         mpl.rcParams[key] = plot_params["rcparams"][key]
-    folderplot = FOLDEROOTS+ "plots/lineplot"
+    folderplot = FOLDEROOTS+ "plots/hedgehog"
     if not os.path.exists(folderplot):
         os.makedirs(folderplot)
-    for t in TIMESTAMPS:
-        foldertime = FOLDEROOTS + t + "/"
-        avg = {}
-        for met in plot_params["order"]:
-            foldermet = foldertime + met
-            if met!= "real":
-                foldermet+= "_additive_connected"
-                if t != "No":
-                    foldermet += "_built"
-            foldermet += "/"
-            if met == "random":
-                df_concat = pd.DataFrame()
-                for i in range(RAND_TRIAL_NUMBER):
-                    df = pd.read_json(foldermet + f"metrics_growth_{i:02}.json")
-                    df_concat = pd.concat([df_concat, df])
-            else:
-                df_concat = pd.read_json(foldermet + "metrics_growth.json")
-            avg[met] = pd.DataFrame(average_x(df_concat))
-        for auc in ["AUC of Coverage", "AUC of Directness"]:
+    for met_growth, cmap in {
+        "coverage": mpl.colormaps["Blues"],
+        "directness": mpl.colormaps["Oranges"],
+        "betweenness": mpl.colormaps["Greens"],
+    }.items():
+        for met_plot, met_label in {
+            "coverage":"Coverage ($km^2$)",
+            "directness":"Directness",
+            "num_cc":"Number of components",
+            "length_lcc":"Length of LCC (km)",
+        }.items():
             fig, ax = plt.subplots(figsize=plot_params["figsize"])
-            if auc == "AUC of Coverage":
-                yy = "coverage"
-                ax.set_ylabel("Coverage ($km^2$)")
+            if met_plot == "coverage":
                 ratio = 10**6
+            elif met_plot == "length_lcc":
+                ratio = 10**3
             else:
-                yy = "directness"
-                ax.set_ylabel("Directness")
                 ratio = 1
-            for ids, met in enumerate(plot_params["order"][:7]):
-                df = avg[met]
+            ax.set_ylabel(met_label)
+            colors = cmap(np.linspace(0, 1, len(TIMESTAMPS)+7))
+            for idx, t in enumerate(TIMESTAMPS):
+                foldertime = FOLDEROOTS + t + "/"
+                foldermet_real = foldertime + "real/"
+                df = pd.read_json(foldermet_real + "metrics_growth.json")
+                if t=="No":
+                    ax.scatter(
+                        [df["xx"].values[0] / 10**3],
+                        [df[met_plot].values[0] / ratio],
+                        color="black",
+                        marker=".",
+                        s=300,
+                    )
                 ax.plot(
                     df["xx"] / 10**3,
-                    df[yy] / ratio,
-                    **{
-                        key: val[ids]
-                        for key, val in plot_params.items()
-                        if key not in ["dpi", "figsize", "rcparams", "order"]
-                    },
+                    df[met_plot] / ratio,
+                    color="black",
+                    marker="*",
+                    markersize=10,
+                )
+                foldermet_met = foldertime + met_growth + "_additive_connected"
+                if t != "No":
+                    foldermet_met += "_built"
+                foldermet_met += "/"
+                df = pd.read_json(foldermet_met + "metrics_growth.json")
+                ax.plot(
+                    df["xx"] / 10**3,
+                    df[met_plot] / ratio,
+                    color=colors[idx+5],
                 )
             ax.set_xlabel("Built length ($km$)")
             ax.set_axisbelow(True)
             plt.tight_layout()
-            plt.legend()
-            plt.savefig(folderplot + f"/{t}_{yy}_lineplot_additive_average.png")
+            # plt.legend()
+            plt.savefig(folderplot + f"/{met_growth}_growth_{met_plot}_plot_additive_hedgehog.png")
             plt.close()
 
 

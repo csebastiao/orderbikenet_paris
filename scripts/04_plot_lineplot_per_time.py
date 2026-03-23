@@ -52,21 +52,25 @@ def main():
             else:
                 df_concat = pd.read_json(foldermet + "metrics_growth.json")
             avg[met] = pd.DataFrame(average_x(df_concat))
-        for auc in ["AUC of Coverage", "AUC of Directness"]:
+        for met_plot, met_label in {
+            "coverage":"Coverage ($km^2$)",
+            "directness":"Directness",
+            "num_cc":"Number of components",
+            "length_lcc":"Length of LCC (km)",
+        }.items():
             fig, ax = plt.subplots(figsize=plot_params["figsize"])
-            if auc == "AUC of Coverage":
-                yy = "coverage"
-                ax.set_ylabel("Coverage ($km^2$)")
+            if met_plot == "coverage":
                 ratio = 10**6
+            elif met_plot == "length_lcc":
+                ratio = 10**3
             else:
-                yy = "directness"
-                ax.set_ylabel("Directness")
                 ratio = 1
+            ax.set_ylabel(met_label)
             for ids, met in enumerate(plot_params["order"]):
                 df = avg[met]
                 ax.plot(
                     df["xx"] / 10**3,
-                    df[yy] / ratio,
+                    df[met_plot] / ratio,
                     **{
                         key: val[ids]
                         for key, val in plot_params.items()
@@ -77,7 +81,7 @@ def main():
             ax.set_axisbelow(True)
             plt.tight_layout()
             plt.legend()
-            plt.savefig(folderplot + f"/{t}_{yy}_lineplot_additive_average.png")
+            plt.savefig(folderplot + f"/{t}_{met_plot}_lineplot_additive_average.png")
             plt.close()
 
 
