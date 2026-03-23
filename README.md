@@ -1,4 +1,5 @@
 # Orderbikenet - Paris
+
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
@@ -7,6 +8,7 @@
 Application of [Orderbike](https://github.com/csebastiao/orderbike) to Paris bicycle network, specifically the Plan Vélo 2021-2026.
 
 ## Installation
+
 First clone the repository:
 
 ```
@@ -24,6 +26,7 @@ Or create a new environment with the dependencies with `conda` or `mamba` using 
 ```
 mamba env create -f environment.yml
 ```
+
 Then, install the virtual environment's kernel in Jupyter:
 
 ```
@@ -54,8 +57,6 @@ You can now run `jupyter lab` with kernel `orderbikenet_paris` (Kernel > Change 
 
 ## Credits
 
-Please cite as: AUTHOR1, AUTHOR2, and AUTHOR3, PROJECTNAME, JOURNAL (YYYY), DOIURL  
+Please cite as: AUTHOR1, AUTHOR2, and AUTHOR3, PROJECTNAME, JOURNAL (YYYY), DOIURL
 
 Development of PROJECTNAME was supported by FUNDER.
-
-

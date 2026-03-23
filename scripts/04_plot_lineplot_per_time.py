@@ -31,7 +31,7 @@ def main():
         plot_params = json.load(f)
     for key in plot_params["rcparams"]:
         mpl.rcParams[key] = plot_params["rcparams"][key]
-    folderplot = FOLDEROOTS+ "plots/lineplot"
+    folderplot = FOLDEROOTS + "plots/lineplot"
     if not os.path.exists(folderplot):
         os.makedirs(folderplot)
     for t in TIMESTAMPS:
@@ -39,8 +39,8 @@ def main():
         avg = {}
         for met in plot_params["order"]:
             foldermet = foldertime + met
-            if met!= "real":
-                foldermet+= "_additive_connected"
+            if met != "real":
+                foldermet += "_additive_connected"
                 if t != "No":
                     foldermet += "_built"
             foldermet += "/"
@@ -53,10 +53,10 @@ def main():
                 df_concat = pd.read_json(foldermet + "metrics_growth.json")
             avg[met] = pd.DataFrame(average_x(df_concat))
         for met_plot, met_label in {
-            "coverage":"Coverage ($km^2$)",
-            "directness":"Directness",
-            "num_cc":"Number of components",
-            "length_lcc":"Length of LCC (km)",
+            "coverage": "Coverage ($km^2$)",
+            "directness": "Directness",
+            "num_cc": "Number of components",
+            "length_lcc": "Length of LCC (km)",
         }.items():
             fig, ax = plt.subplots(figsize=plot_params["figsize"])
             if met_plot == "coverage":

@@ -62,28 +62,17 @@ def main():
                     },
                 )
                 if met == "random":
-                    xx_mean = df_growth[mask_tim & mask_met][
-                        "AUC of Directness"
-                    ].mean()
-                    xx_std = df_growth[mask_tim & mask_met][
-                        "AUC of Directness"
-                    ].std()
-                    yy_mean = df_growth[mask_tim & mask_met][
-                        "AUC of Coverage"
-                    ].mean()
-                    yy_std = df_growth[mask_tim & mask_met][
-                        "AUC of Coverage"
-                    ].std()
+                    xx_mean = df_growth[mask_tim & mask_met]["AUC of Directness"].mean()
+                    xx_std = df_growth[mask_tim & mask_met]["AUC of Directness"].std()
+                    yy_mean = df_growth[mask_tim & mask_met]["AUC of Coverage"].mean()
+                    yy_std = df_growth[mask_tim & mask_met]["AUC of Coverage"].std()
                     ax.errorbar(
                         x=xx_mean,
                         y=yy_mean,
                         yerr=yy_std * 2,
                         xerr=xx_std * 2,
                         fmt="o",
-                        **{
-                            key: val
-                            for key, val in plot_params["errorbar"].items()
-                        },
+                        **{key: val for key, val in plot_params["errorbar"].items()},
                     )
             ax.set_xlabel("AUC of directness")
             ax.set_ylabel("AUC of coverage")
@@ -123,9 +112,7 @@ def main():
                 zorder=1,
                 label="Pareto front",
             )
-            plt.legend(
-                prop={"size": plot_params["rcparams"]["font.size"] * 0.75}
-            )
+            plt.legend(prop={"size": plot_params["rcparams"]["font.size"] * 0.75})
             plt.savefig(savename)
             plt.close()
 

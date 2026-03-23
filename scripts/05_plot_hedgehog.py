@@ -31,7 +31,7 @@ def main():
         plot_params = json.load(f)
     for key in plot_params["rcparams"]:
         mpl.rcParams[key] = plot_params["rcparams"][key]
-    folderplot = FOLDEROOTS+ "plots/hedgehog"
+    folderplot = FOLDEROOTS + "plots/hedgehog"
     if not os.path.exists(folderplot):
         os.makedirs(folderplot)
     for met_growth, cmap in {
@@ -40,10 +40,10 @@ def main():
         "betweenness": mpl.colormaps["Greens"],
     }.items():
         for met_plot, met_label in {
-            "coverage":"Coverage ($km^2$)",
-            "directness":"Directness",
-            "num_cc":"Number of components",
-            "length_lcc":"Length of LCC (km)",
+            "coverage": "Coverage ($km^2$)",
+            "directness": "Directness",
+            "num_cc": "Number of components",
+            "length_lcc": "Length of LCC (km)",
         }.items():
             fig, ax = plt.subplots(figsize=plot_params["figsize"])
             if met_plot == "coverage":
@@ -53,12 +53,12 @@ def main():
             else:
                 ratio = 1
             ax.set_ylabel(met_label)
-            colors = cmap(np.linspace(0, 1, len(TIMESTAMPS)+7))
+            colors = cmap(np.linspace(0, 1, len(TIMESTAMPS) + 7))
             for idx, t in enumerate(TIMESTAMPS):
                 foldertime = FOLDEROOTS + t + "/"
                 foldermet_real = foldertime + "real/"
                 df = pd.read_json(foldermet_real + "metrics_growth.json")
-                if t=="No":
+                if t == "No":
                     ax.scatter(
                         [df["xx"].values[0] / 10**3],
                         [df[met_plot].values[0] / ratio],
@@ -81,13 +81,16 @@ def main():
                 ax.plot(
                     df["xx"] / 10**3,
                     df[met_plot] / ratio,
-                    color=colors[idx+5],
+                    color=colors[idx + 5],
                 )
             ax.set_xlabel("Built length ($km$)")
             ax.set_axisbelow(True)
             plt.tight_layout()
             # plt.legend()
-            plt.savefig(folderplot + f"/{met_growth}_growth_{met_plot}_plot_additive_hedgehog.png")
+            plt.savefig(
+                folderplot
+                + f"/{met_growth}_growth_{met_plot}_plot_additive_hedgehog.png"
+            )
             plt.close()
 
 

@@ -29,8 +29,8 @@ TIMESTAMPS = [
 ]
 
 
-#FIXME test of valid edges in subtractive order to make it faster (take ages right now !)
-#FIXME error edges are not well named
+# FIXME test of valid edges in subtractive order to make it faster (take ages right now !)
+# FIXME error edges are not well named
 def main():
     CONNECTED = True
     ranking_func = {}
@@ -43,16 +43,14 @@ def main():
         foldertime = FOLDEROOTS + "/" + built_val
         if not os.path.exists(foldertime):
             os.makedirs(foldertime)
-        log.info(
-                    f"Start computation for timestamp {built_val}"
-                )
+        log.info(f"Start computation for timestamp {built_val}")
         H = G.copy()
         if built_val == "No":
             built = False
         else:
             built = True
             for e in H.edges:
-                if H.edges[e]["built"] in TIMESTAMPS[:idx+1]:
+                if H.edges[e]["built"] in TIMESTAMPS[: idx + 1]:
                     H.edges[e]["built"] = 1
                 else:
                     H.edges[e]["built"] = 0

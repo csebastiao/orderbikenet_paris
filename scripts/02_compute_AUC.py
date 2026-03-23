@@ -6,10 +6,7 @@ Script to compute the Area Under the Curve of all metrics for all strategies for
 
 import json
 import pandas as pd
-import networkx as nx
-import osmnx as ox
-from orderbike.utils import auc_from_metrics_dict, get_auc
-from orderbike.metrics import directness, coverage
+from orderbike.utils import auc_from_metrics_dict
 
 
 FOLDEROOTS = "./data/processed/paris_simplified_results/"
@@ -30,7 +27,7 @@ TIMESTAMPS = [
 
 def main():
     for exp_disc in [True, False]:
-        timestamp_aucs = [] 
+        timestamp_aucs = []
         for idx, t in enumerate(TIMESTAMPS):
             foldertime = FOLDEROOTS + t + "/"
             # Open for all growth strategies for a toy graph
@@ -45,8 +42,8 @@ def main():
                 "real",
             ]:
                 foldermet = foldertime + metric
-                if metric!= "real":
-                    foldermet+= "_additive_connected"
+                if metric != "real":
+                    foldermet += "_additive_connected"
                     if t != "No":
                         foldermet += "_built"
                 foldermet += "/"
@@ -70,12 +67,10 @@ def main():
                             exp_discounting=exp_disc,
                             normalize_max_auc=False,
                         )
-                        timestamp_aucs.append(
-                            [t, metric, i, auc_cov, auc_dir]
-                        )
+                        timestamp_aucs.append([t, metric, i, auc_cov, auc_dir])
                 else:
                     with open(foldermet + "metrics_growth.json", "r") as f:
-                            met_dict = json.load(f)
+                        met_dict = json.load(f)
                     auc_cov = auc_from_metrics_dict(
                         met_dict,
                         "coverage",
@@ -92,9 +87,7 @@ def main():
                         exp_discounting=exp_disc,
                         normalize_max_auc=False,
                     )
-                    timestamp_aucs.append(
-                        [t, metric, 0, auc_cov, auc_dir]
-                    )
+                    timestamp_aucs.append([t, metric, 0, auc_cov, auc_dir])
         # Save everything as JSON with Pandas Dataframe
         df_growth = pd.DataFrame(
             timestamp_aucs,

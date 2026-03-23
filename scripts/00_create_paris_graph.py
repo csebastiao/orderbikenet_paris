@@ -35,19 +35,47 @@ def main():
     for e in H.edges:
         if H.edges[e]["2023-05-17 Etat"] in "Réalisé Pré-2021":
             H.edges[e]["built"] = "2021-01-01"
-        elif H.edges[e]["2023-05-17 Etat"] in ["Réalisé dans le Plan Vélo", "Annoncé réalisé", "Hors Plan Vélo (Embellir)"]:
+        elif H.edges[e]["2023-05-17 Etat"] in [
+            "Réalisé dans le Plan Vélo",
+            "Annoncé réalisé",
+            "Hors Plan Vélo (Embellir)",
+        ]:
             H.edges[e]["built"] = "2023-05-17"
-        elif H.edges[e]["2023-10-01 Etat"] in ["Réalisé dans le Plan Vélo", "Annoncé réalisé", "Hors Plan Vélo (Embellir)"]:
+        elif H.edges[e]["2023-10-01 Etat"] in [
+            "Réalisé dans le Plan Vélo",
+            "Annoncé réalisé",
+            "Hors Plan Vélo (Embellir)",
+        ]:
             H.edges[e]["built"] = "2023-10-01"
-        elif H.edges[e]["2024-01-15 Etat"] in ["Réalisé dans le Plan Vélo", "Annoncé réalisé", "Hors Plan Vélo (Embellir)"]:
+        elif H.edges[e]["2024-01-15 Etat"] in [
+            "Réalisé dans le Plan Vélo",
+            "Annoncé réalisé",
+            "Hors Plan Vélo (Embellir)",
+        ]:
             H.edges[e]["built"] = "2024-01-15"
-        elif H.edges[e]["2024-04-04 Etat"] in ["Réalisé dans le Plan Vélo", "Annoncé réalisé", "Hors Plan Vélo (Embellir)"]:
+        elif H.edges[e]["2024-04-04 Etat"] in [
+            "Réalisé dans le Plan Vélo",
+            "Annoncé réalisé",
+            "Hors Plan Vélo (Embellir)",
+        ]:
             H.edges[e]["built"] = "2024-04-04"
-        elif H.edges[e]["2024-08-22 Etat"] in ["Réalisé dans le Plan Vélo", "Annoncé réalisé", "Hors Plan Vélo (Embellir)"]:
+        elif H.edges[e]["2024-08-22 Etat"] in [
+            "Réalisé dans le Plan Vélo",
+            "Annoncé réalisé",
+            "Hors Plan Vélo (Embellir)",
+        ]:
             H.edges[e]["built"] = "2024-08-22"
-        elif H.edges[e]["2024-12-22 Etat"] in ["Réalisé dans le Plan Vélo", "Annoncé réalisé", "Hors Plan Vélo (Embellir)"]:
+        elif H.edges[e]["2024-12-22 Etat"] in [
+            "Réalisé dans le Plan Vélo",
+            "Annoncé réalisé",
+            "Hors Plan Vélo (Embellir)",
+        ]:
             H.edges[e]["built"] = "2024-12-22"
-        elif H.edges[e]["Etat"] in ["Réalisé dans le Plan Vélo", "Annoncé réalisé", "Hors Plan Vélo (Embellir)"]:
+        elif H.edges[e]["Etat"] in [
+            "Réalisé dans le Plan Vélo",
+            "Annoncé réalisé",
+            "Hors Plan Vélo (Embellir)",
+        ]:
             H.edges[e]["built"] = "2025-06-02"
         else:
             H.edges[e]["built"] = "No"
@@ -70,4 +98,4 @@ def main():
 
 
 if __name__ == "__main__":
-   main()
+    main()
