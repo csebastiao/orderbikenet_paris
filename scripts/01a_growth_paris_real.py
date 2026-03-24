@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Plot the AUC in additive order of all strategies on the tested graphs.
+Replicate the real growth order on Paris graph.
 """
 
 
@@ -25,7 +25,7 @@ TIMESTAMPS = [
     "No",
 ]
 
-# FIXME relative directness not working currently
+# FIXME relative directness not working currently for some reason
 
 
 def main():

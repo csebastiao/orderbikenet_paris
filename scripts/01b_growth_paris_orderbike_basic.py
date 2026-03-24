@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Script to find growth order on Paris graph, with all growth strategies, dynamic and ranked, and random trials.
+Find growth order on Paris graph, with all growth strategies, dynamic and ranked, and random trials.
 """
 
 
@@ -32,7 +32,6 @@ TIMESTAMPS = [
 # FIXME test of valid edges in subtractive order to make it faster (take ages right now !)
 # FIXME error edges are not well named
 def main():
-    CONNECTED = True
     ranking_func = {}
     ranking_func["closeness"] = metrics.growth_closeness
     ranking_func["betweenness"] = metrics.growth_betweenness
@@ -73,9 +72,9 @@ def main():
                     kwargs = {"max_buff": BUFF_SIZE * 2, "min_buff": BUFF_SIZE / 2}
                 else:
                     kwargs = {}
-                foldername = foldertime + "/" + metric_name + "_" + order_name
-                if CONNECTED:
-                    foldername += "_connected"
+                foldername = (
+                    foldertime + "/" + metric_name + "_" + order_name + "_connected"
+                )
                 if built:
                     foldername += "_built"
                 if not os.path.exists(foldername):
@@ -83,7 +82,7 @@ def main():
                 metrics_dict, order_growth = growth.order_dynamic_network_growth(
                     H,
                     built=built,
-                    keep_connected=CONNECTED,
+                    keep_connected=True,
                     order=order_name,
                     metric=metric_name,
                     progress_bar=False,
@@ -99,9 +98,9 @@ def main():
                 log.info(
                     f"Start computation for metric {metric_name}, order {order_name}"
                 )
-                foldername = foldertime + "/" + metric_name + "_" + order_name
-                if CONNECTED:
-                    foldername += "_connected"
+                foldername = (
+                    foldertime + "/" + metric_name + "_" + order_name + "_connected"
+                )
                 if built:
                     foldername += "_built"
                 if not os.path.exists(foldername):
@@ -109,7 +108,7 @@ def main():
                 metrics_dict, order_growth = growth.order_ranked_network_growth(
                     H,
                     built=built,
-                    keep_connected=CONNECTED,
+                    keep_connected=True,
                     order=order_name,
                     ranking_func=ranking_func[metric_name],
                     save_metrics=True,
@@ -120,9 +119,7 @@ def main():
                 with open(foldername + "/metrics_growth.json", "w") as f:
                     json.dump(metrics_dict, f)
             log.info(f"Start random computation, order {order_name}")
-            foldername = foldertime + "/" + "random_" + order_name
-            if CONNECTED:
-                foldername += "_connected"
+            foldername = foldertime + "/" + "random_" + order_name + "_connected"
             if built:
                 foldername += "_built"
             if not os.path.exists(foldername):
@@ -132,7 +129,7 @@ def main():
                 metrics_dict, order_growth = growth.order_ranked_network_growth(
                     H,
                     built=built,
-                    keep_connected=CONNECTED,
+                    keep_connected=True,
                     order=order_name,
                     ranking_func=metrics.growth_random,
                     save_metrics=True,
