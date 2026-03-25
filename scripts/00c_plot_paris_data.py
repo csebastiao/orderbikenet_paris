@@ -32,10 +32,7 @@ def main():
     ax.axis("off")
     fig.savefig(folderplots + "Paris_population_density_IRIS.png", dpi=DPI)
     gdf_vote = gpd.read_file(FOLDER_DATA + "paris_vote_list.gpkg")
-    gdf_vote["NB_EXPRIM"] = gdf_vote["NB_EXPRIM"].map(float)
     for party, color in PARTY_DICT.items():
-        gdf_vote[party] = gdf_vote[party].map(float)
-        gdf_vote[party + "_share"] = gdf_vote[party] / gdf_vote["NB_EXPRIM"]
         fig, ax = plt.subplots(layout="constrained")
         gdf_vote.plot(
             ax=ax,

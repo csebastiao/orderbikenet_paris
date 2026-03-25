@@ -6,9 +6,12 @@ Create paris demographics processed files from raw files.
 import os
 import geopandas as gpd
 import pandas as pd
+import shapely
+import osmnx as ox
 
 FOLDER_IN = "./data/raw/official_data/"
 FOLDER_OUT = "./data/processed/paris_official_data/"
+BUFF_SIZE = 400
 
 
 def main():
@@ -162,13 +165,16 @@ def main():
         + "IRIS_geometry_2021/IRIS-GE/1_DONNEES_LIVRAISON_2021-06-00135/IRIS-GE_2-0_SHP_LAMB93_FXX-2021/IRIS_GE.SHP"
     )
     gdf_iris = gdf_iris.to_crs(epsg=4326)
-    gdf_paris_iris = gpd.sjoin(
-        gdf_iris, gdf_paris_vote, how="left", predicate="intersects"
+    G = ox.load_graphml(
+        "./data/processed/paris_simplified_results/paris_cleaned_multigraph.graphml"
     )
-    gdf_paris_iris = gdf_paris_iris[gdf_paris_iris["index_right"].notna()][
-        ["CODE_IRIS", "geometry"]
+    edges = (
+        ox.graph_to_gdfs(G, edges=True, nodes=False).buffer(BUFF_SIZE).to_crs(epsg=4326)
+    )
+    gdf_paris_iris = gdf_iris[
+        gdf_iris.intersects(shapely.Polygon(edges.union_all().exterior))
     ]
-    gdf_paris_iris = gdf_paris_iris.drop_duplicates()
+    gdf_paris_iris = gdf_paris_iris[["CODE_IRIS", "geometry"]]
     gdf_paris_iris_pop = gdf_paris_iris.merge(df_iris_pop, on="CODE_IRIS")
     gdf_paris_iris_pop = gdf_paris_iris_pop.to_crs(
         gdf_paris_iris_pop.estimate_utm_crs()
@@ -199,6 +205,12 @@ def main():
         ),
         crs="epsg:4326",
     )
+    for col in list(gdf_paris_vote_list.columns)[:16]:
+        gdf_paris_vote_list[col] = gdf_paris_vote_list[col].map(float).map(int)
+    for col in list(gdf_paris_vote_list.columns)[:9]:
+        gdf_paris_vote_list[col + "_share"] = (
+            gdf_paris_vote_list[col] / gdf_paris_vote_list["NB_EXPRIM"]
+        )
     gdf_paris_vote_list.to_file(FOLDER_OUT + "paris_vote_list.gpkg")
 
 
