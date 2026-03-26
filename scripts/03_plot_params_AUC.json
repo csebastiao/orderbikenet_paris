@@ -1,11 +1,11 @@
 {
-    "order":["coverage", "adaptive_coverage", "directness", "relative_directness", "betweenness","closeness", "random", "real"],
-    "label":["Coverage", "Adaptive coverage", "Directness", "Relative directness", "Betweenness","Closeness", "Random", "Real"],
-    "color":["#0173b2", "#56b4e9", "#d55e00", "#de8f05", "#029e73", "#cc78bc", "#adadad", "black"],
-    "edgecolor":["Face", "Face", "Face", "Face", "Face", "Face", "Face", "Face"],
-    "marker":["^", "v", "s", "D", "h", "p", "o", "*"],
-    "alpha":[0.65, 0.65, 0.65, 0.65, 0.65, 0.65, 0.5, 1],
-    "s":[30, 30, 30, 25, 35, 35, 20, 100],
+    "order":["coverage", "adaptive_coverage", "directness", "relative_directness", "betweenness","closeness", "random", "real", "manual"],
+    "label":["Coverage", "Adaptive coverage", "Directness", "Relative directness", "Betweenness","Closeness", "Random", "Real", "Manual"],
+    "color":["#0173b2", "#56b4e9", "#d55e00", "#de8f05", "#029e73", "#cc78bc", "#adadad", "black", "black"],
+    "edgecolor":["Face", "Face", "Face", "Face", "Face", "Face", "Face", "Face", "Face"],
+    "marker":["^", "v", "s", "D", "h", "p", "o", "*", "X"],
+    "alpha":[0.65, 0.65, 0.65, 0.65, 0.65, 0.65, 0.5, 1, 1],
+    "s":[30, 30, 30, 25, 35, 35, 20, 100, 100],
     "figsize":[6.18, 6.18],
     "errorbar":{
         "elinewidth":1,

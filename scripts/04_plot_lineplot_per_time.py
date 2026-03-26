@@ -36,10 +36,14 @@ def main():
         os.makedirs(folderplot)
     for t in TIMESTAMPS:
         foldertime = FOLDEROOTS + t + "/"
+        if t != "No":
+            size = 8
+        else:
+            size = 9
         avg = {}
-        for met in plot_params["order"]:
+        for met in plot_params["order"][:size]:
             foldermet = foldertime + met
-            if met != "real":
+            if met != "real" and met != "manual":
                 foldermet += "_additive_connected"
                 if t != "No":
                     foldermet += "_built"
@@ -66,7 +70,7 @@ def main():
             else:
                 ratio = 1
             ax.set_ylabel(met_label)
-            for ids, met in enumerate(plot_params["order"]):
+            for ids, met in enumerate(plot_params["order"][:size]):
                 df = avg[met]
                 ax.plot(
                     df["xx"] / 10**3,

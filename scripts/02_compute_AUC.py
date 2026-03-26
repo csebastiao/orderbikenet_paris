@@ -40,16 +40,42 @@ def main():
                 "closeness",
                 "random",
                 "real",
+                "manual",
             ]:
-                foldermet = foldertime + metric
-                if metric != "real":
-                    foldermet += "_additive_connected"
-                    if t != "No":
-                        foldermet += "_built"
-                foldermet += "/"
-                if metric == "random":
-                    for i in range(RAND_TRIAL_NUMBER):
-                        with open(foldermet + f"metrics_growth_{i:02}.json", "r") as f:
+                if t != "No" and metric == "manual":
+                    pass
+                else:
+                    foldermet = foldertime + metric
+                    if metric != "real" and metric != "manual":
+                        foldermet += "_additive_connected"
+                        if t != "No":
+                            foldermet += "_built"
+                    foldermet += "/"
+                    if metric == "random":
+                        for i in range(RAND_TRIAL_NUMBER):
+                            with open(
+                                foldermet + f"metrics_growth_{i:02}.json", "r"
+                            ) as f:
+                                met_dict = json.load(f)
+                            auc_cov = auc_from_metrics_dict(
+                                met_dict,
+                                "coverage",
+                                normalize_y=True,
+                                yaxis_method="natural",
+                                exp_discounting=exp_disc,
+                                normalize_max_auc=False,
+                            )
+                            auc_dir = auc_from_metrics_dict(
+                                met_dict,
+                                "directness",
+                                normalize_y=False,
+                                max_comparison_y="one",
+                                exp_discounting=exp_disc,
+                                normalize_max_auc=False,
+                            )
+                            timestamp_aucs.append([t, metric, i, auc_cov, auc_dir])
+                    else:
+                        with open(foldermet + "metrics_growth.json", "r") as f:
                             met_dict = json.load(f)
                         auc_cov = auc_from_metrics_dict(
                             met_dict,
@@ -67,27 +93,7 @@ def main():
                             exp_discounting=exp_disc,
                             normalize_max_auc=False,
                         )
-                        timestamp_aucs.append([t, metric, i, auc_cov, auc_dir])
-                else:
-                    with open(foldermet + "metrics_growth.json", "r") as f:
-                        met_dict = json.load(f)
-                    auc_cov = auc_from_metrics_dict(
-                        met_dict,
-                        "coverage",
-                        normalize_y=True,
-                        yaxis_method="natural",
-                        exp_discounting=exp_disc,
-                        normalize_max_auc=False,
-                    )
-                    auc_dir = auc_from_metrics_dict(
-                        met_dict,
-                        "directness",
-                        normalize_y=False,
-                        max_comparison_y="one",
-                        exp_discounting=exp_disc,
-                        normalize_max_auc=False,
-                    )
-                    timestamp_aucs.append([t, metric, 0, auc_cov, auc_dir])
+                        timestamp_aucs.append([t, metric, 0, auc_cov, auc_dir])
         # Save everything as JSON with Pandas Dataframe
         df_growth = pd.DataFrame(
             timestamp_aucs,

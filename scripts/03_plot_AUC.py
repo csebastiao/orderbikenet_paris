@@ -41,8 +41,12 @@ def main():
         df_growth = pd.read_json(savename)
         for t in TIMESTAMPS:
             mask_tim = df_growth["Timestamp"] == t
+            if t != "No":
+                size = 8
+            else:
+                size = 9
             fig, ax = plt.subplots(figsize=plot_params["figsize"])
-            for ids, met in enumerate(plot_params["order"]):
+            for ids, met in enumerate(plot_params["order"][:size]):
                 mask_met = df_growth["Metric optimized"] == met
                 ax.scatter(
                     df_growth[mask_tim & mask_met]["AUC of Directness"],
