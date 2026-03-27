@@ -183,7 +183,60 @@ def main():
         lambda df: df.P21_POP / (df.geometry.area / 10**6), axis=1
     )
     gdf_paris_iris_pop = gdf_paris_iris_pop.to_crs(epsg=4326)
-    gdf_paris_iris_pop.to_file(FOLDER_OUT + "paris_pop_iris.gpkg")
+    df_iris_income = pd.read_csv(
+        FOLDER_IN + "IRIS_income_2021/BASE_TD_FILO_IRIS_2021_DISP.csv",
+        delimiter=";",
+        low_memory=False,
+    )
+    df_iris_income = df_iris_income.rename({"IRIS": "CODE_IRIS"}, axis=1)
+    gdf_paris_iris_pop_income = gdf_paris_iris_pop.merge(df_iris_income, on="CODE_IRIS")
+    df_iris_activity = pd.read_csv(
+        FOLDER_IN + "IRIS_activity_2021/base-ic-activite-residents-2021.CSV",
+        delimiter=";",
+        low_memory=False,
+    )
+    df_iris_activity = df_iris_activity.rename({"IRIS": "CODE_IRIS"}, axis=1)
+    gdf_paris_iris_all = gdf_paris_iris_pop_income.merge(
+        df_iris_activity, on="CODE_IRIS"
+    )
+    gdf_paris_iris_all.to_file(FOLDER_OUT + "paris_dem_iris.gpkg")
+    gdf_small = gdf_paris_iris_all[
+        [
+            "CODE_IRIS",
+            "P21_POP",
+            "pop_density",
+            "C21_ACTOCC15P",
+            "C21_ACTOCC15P_VELO",
+            "C21_ACTOCC15P_VOIT",
+            "DISP_MED21",
+            "DISP_TP6021",
+            "geometry",
+        ]
+    ]
+    gdf_small["DISP_TP6021"] = gdf_small["DISP_TP6021"].apply(
+        lambda x: -1 if "n" in x else int(float(x.replace(",", ".")))
+    )
+    gdf_small["DISP_MED21"] = gdf_small["DISP_MED21"].apply(
+        lambda x: -1 if "n" in x else int(float(x.replace(",", ".")))
+    )
+    gdf_small["commuter_cyclist_share"] = (
+        gdf_small.C21_ACTOCC15P_VELO / gdf_small.C21_ACTOCC15P
+    )
+    gdf_small["commuter_driver_share"] = (
+        gdf_small.C21_ACTOCC15P_VOIT / gdf_small.C21_ACTOCC15P
+    )
+    gdf_small = gdf_small.rename(
+        {
+            "P21_POP": "population",
+            "DISP_TP6021": "poverty_rate",
+            "DISP_MED21": "median_income",
+            "C21_ACTOCC15P": "active_population",
+        },
+        axis=1,
+    )
+    gdf_small = gdf_small.drop(["C21_ACTOCC15P_VELO", "C21_ACTOCC15P_VOIT"], axis=1)
+    gdf_small.to_file(FOLDER_OUT + "paris_dem_iris_condensed.gpkg")
+    # TODO make smaller version with relevant columns and clearer column names
     gdf_paris_vote_list = gpd.GeoDataFrame(
         gdf_paris_vote.rename(candidates, axis=1)
         .T.groupby(level=0, by=set(nuances))
