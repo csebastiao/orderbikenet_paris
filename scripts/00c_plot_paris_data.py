@@ -22,15 +22,21 @@ def main():
     folderplots = FOLDER_DATA + "plots/"
     if not os.path.exists(folderplots):
         os.makedirs(folderplots)
-    gdf_pop = gpd.read_file(FOLDER_DATA + "paris_pop_iris.gpkg")
-    fig, ax = plt.subplots(layout="constrained")
-    gdf_pop.plot(ax=ax, column="P21_POP", cmap="inferno", legend=True)
-    ax.axis("off")
-    fig.savefig(folderplots + "Paris_population_count_IRIS.png", dpi=DPI)
-    fig, ax = plt.subplots(layout="constrained")
-    gdf_pop.plot(ax=ax, column="pop_density", cmap="inferno", legend=True)
-    ax.axis("off")
-    fig.savefig(folderplots + "Paris_population_density_IRIS.png", dpi=DPI)
+    gdf_pop = gpd.read_file(FOLDER_DATA + "paris_dem_iris_condensed.gpkg")
+    for column_name, cmap in {
+        "population": "inferno",
+        "pop_density": "inferno",
+        "poverty_rate": "Reds",
+        "median_income": "Greens",
+        "commuter_cyclist_share": "Greens",
+        "commuter_driver_share": "Reds",
+    }.items():
+        fig, ax = plt.subplots(layout="constrained")
+        gdf_pop.plot(
+            ax=ax, column=column_name, cmap=cmap, legend=True, scheme="fisher_jenks"
+        )
+        ax.axis("off")
+        fig.savefig(folderplots + "Paris_" + column_name + "_IRIS.png", dpi=DPI)
     gdf_vote = gpd.read_file(FOLDER_DATA + "paris_vote_list.gpkg")
     for party, color in PARTY_DICT.items():
         fig, ax = plt.subplots(layout="constrained")

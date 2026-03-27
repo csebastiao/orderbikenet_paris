@@ -213,6 +213,7 @@ def main():
             "geometry",
         ]
     ]
+    # TODO find way to remove settingwithcopywarning
     gdf_small["DISP_TP6021"] = gdf_small["DISP_TP6021"].apply(
         lambda x: -1 if "n" in x else int(float(x.replace(",", ".")))
     )
@@ -265,6 +266,9 @@ def main():
             gdf_paris_vote_list[col] / gdf_paris_vote_list["NB_EXPRIM"]
         )
     gdf_paris_vote_list.to_file(FOLDER_OUT + "paris_vote_list.gpkg")
+    gdf_businesses_apur = gpd.read_file(FOLDER_IN + "APUR_businesses_2020.geojson")
+    # TODO make some changes for clarity
+    gdf_businesses_apur.to_file(FOLDER_OUT + "paris_businesses_apur.gpkg")
 
 
 if __name__ == "__main__":
