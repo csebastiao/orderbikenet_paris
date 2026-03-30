@@ -42,6 +42,7 @@ def main():
         for met_plot, met_label in {
             "coverage": "Coverage ($km^2$)",
             "directness": "Directness",
+            "directness_alt": "Directness (alt)",
             "num_cc": "Number of components",
             "length_lcc": "Length of LCC (km)",
         }.items():

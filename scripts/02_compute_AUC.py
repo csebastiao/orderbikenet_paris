@@ -73,7 +73,17 @@ def main():
                                 exp_discounting=exp_disc,
                                 normalize_max_auc=False,
                             )
-                            timestamp_aucs.append([t, metric, i, auc_cov, auc_dir])
+                            auc_dir_alt = auc_from_metrics_dict(
+                                met_dict,
+                                "directness_alt",
+                                normalize_y=False,
+                                max_comparison_y="one",
+                                exp_discounting=exp_disc,
+                                normalize_max_auc=False,
+                            )
+                            timestamp_aucs.append(
+                                [t, metric, i, auc_cov, auc_dir, auc_dir_alt]
+                            )
                     else:
                         with open(foldermet + "metrics_growth.json", "r") as f:
                             met_dict = json.load(f)
@@ -93,7 +103,17 @@ def main():
                             exp_discounting=exp_disc,
                             normalize_max_auc=False,
                         )
-                        timestamp_aucs.append([t, metric, 0, auc_cov, auc_dir])
+                        auc_dir_alt = auc_from_metrics_dict(
+                            met_dict,
+                            "directness_alt",
+                            normalize_y=False,
+                            max_comparison_y="one",
+                            exp_discounting=exp_disc,
+                            normalize_max_auc=False,
+                        )
+                        timestamp_aucs.append(
+                            [t, metric, 0, auc_cov, auc_dir, auc_dir_alt]
+                        )
         # Save everything as JSON with Pandas Dataframe
         df_growth = pd.DataFrame(
             timestamp_aucs,
@@ -103,6 +123,7 @@ def main():
                 "Trial",
                 "AUC of Coverage",
                 "AUC of Directness",
+                "AUC of Directness (alt)",
             ],
         )
         savename = str(FOLDEROOTS) + "auc_table_growth_additive"

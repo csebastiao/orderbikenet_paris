@@ -23,6 +23,7 @@ TIMESTAMPS = [
     "2025-06-02",
     "No",
 ]
+X_CHOICE = "AUC of Directness"
 
 
 def main():
@@ -49,7 +50,7 @@ def main():
             for ids, met in enumerate(plot_params["order"][:size]):
                 mask_met = df_growth["Metric optimized"] == met
                 ax.scatter(
-                    df_growth[mask_tim & mask_met]["AUC of Directness"],
+                    df_growth[mask_tim & mask_met][X_CHOICE],
                     df_growth[mask_tim & mask_met]["AUC of Coverage"],
                     zorder=2,
                     **{
@@ -66,8 +67,8 @@ def main():
                     },
                 )
                 if met == "random":
-                    xx_mean = df_growth[mask_tim & mask_met]["AUC of Directness"].mean()
-                    xx_std = df_growth[mask_tim & mask_met]["AUC of Directness"].std()
+                    xx_mean = df_growth[mask_tim & mask_met][X_CHOICE].mean()
+                    xx_std = df_growth[mask_tim & mask_met][X_CHOICE].std()
                     yy_mean = df_growth[mask_tim & mask_met]["AUC of Coverage"].mean()
                     yy_std = df_growth[mask_tim & mask_met]["AUC of Coverage"].std()
                     ax.errorbar(
@@ -89,8 +90,8 @@ def main():
             ax.yaxis.set_major_locator(loc)
             plt.axis("square")
             # Set rounded limits at smallest and highest 0.1
-            dirmin = df_growth[mask_tim]["AUC of Directness"].min()
-            dirmax = df_growth[mask_tim]["AUC of Directness"].max()
+            dirmin = df_growth[mask_tim][X_CHOICE].min()
+            dirmax = df_growth[mask_tim][X_CHOICE].max()
             covmin = df_growth[mask_tim]["AUC of Coverage"].min()
             covmax = df_growth[mask_tim]["AUC of Coverage"].max()
             mmin = round(min(dirmin, covmin) - 0.05, 1)
@@ -101,14 +102,14 @@ def main():
             parfront = parfront[
                 parfront.apply(
                     lambda x: is_pareto_efficient(
-                        x, parfront, "AUC of Coverage", "AUC of Directness"
+                        x, parfront, "AUC of Coverage", X_CHOICE
                     ),
                     axis=1,
                 )
             ]
-            parfront.sort_values("AUC of Directness", axis=0, inplace=True)
+            parfront.sort_values(X_CHOICE, axis=0, inplace=True)
             ax.plot(
-                parfront["AUC of Directness"],
+                parfront[X_CHOICE],
                 parfront["AUC of Coverage"],
                 linestyle="dashed",
                 linewidth=1,

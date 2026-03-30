@@ -8,7 +8,7 @@ import os
 import json
 import networkx as nx
 import osmnx as ox
-from orderbike.metrics import directness, coverage
+from orderbike.metrics import directness, coverage, directness_alt
 
 
 BUFF_SIZE = 400
@@ -39,6 +39,7 @@ def main():
     G_init = G.edge_subgraph(init_edge)
     tot_length = [sum([G_init.edges[e]["length"] for e in G_init.edges])]
     dir_real = [directness(G_init)]
+    dir_alt_real = [directness_alt(G_init)]
     cov_real = [coverage(G_init, BUFF_SIZE)]
     reldir_real = [0]  # [relative_directness(G_init, G)]
     num_ccs = [nx.number_connected_components(G_init)]
@@ -49,6 +50,7 @@ def main():
         )
         tot_length.append(sum([H.edges[e]["length"] for e in H.edges]))
         dir_real.append(directness(H))
+        dir_alt_real.append(directness_alt(H))
         cov_real.append(coverage(H, BUFF_SIZE))
         reldir_real.append(0)  # reldir_real.append(relative_directness(H, G))
         cc = list(nx.connected_components(H))
@@ -66,6 +68,7 @@ def main():
         met_dict["xx"] = tot_length[idx + 1 :]
         met_dict["coverage"] = cov_real[idx + 1 :]
         met_dict["directness"] = dir_real[idx + 1 :]
+        met_dict["directness_alt"] = dir_alt_real[idx + 1 :]
         met_dict["relative_directness"] = reldir_real[idx + 1 :]
         met_dict["num_cc"] = num_ccs[idx + 1 :]
         met_dict["length_lcc"] = length_lcc[idx + 1 :]
@@ -78,6 +81,7 @@ def main():
     met_dict["xx"] = tot_length
     met_dict["coverage"] = cov_real
     met_dict["directness"] = dir_real
+    met_dict["directness_alt"] = dir_alt_real
     met_dict["relative_directness"] = reldir_real
     met_dict["num_cc"] = num_ccs
     met_dict["length_lcc"] = length_lcc
