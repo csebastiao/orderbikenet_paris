@@ -12,26 +12,27 @@ FOLDEROOTS = "./data/processed/paris_simplified_results/"
 FILENAME = "paris_cleaned_multigraph.graphml"
 TIMESTAMPS = [
     "2021-01-01",
-    "2023-05-17",
-    "2023-10-01",
-    "2024-01-15",
-    "2024-04-04",
-    "2024-08-22",
-    "2024-12-22",
-    "2025-06-02",
-    "No",
+    # "2023-05-17",
+    # "2023-10-01",
+    # "2024-01-15",
+    # "2024-04-04",
+    # "2024-08-22",
+    # "2024-12-22",
+    # "2025-06-02",
+    # "No",
 ]
 BUFF_SIZE = 400
 BUFFER = True
 PLOT_METRICS = False
 DPI = 100  # Larger means bigger files and longer to save, and there are a lot of pictures so quickly taking space and time
 MET_LIST = [
-    "adaptive_coverage",
-    "coverage",
-    "relative_directness",
-    "directness",
-    "betweenness",
-    "closeness",
+    # "adaptive_coverage",
+    # "coverage",
+    # "relative_directness",
+    # "directness",
+    # "betweenness",
+    # "closeness",
+    "directness_alt",
 ]
 
 # TODO add a way to plot also all relevant metrics below or somewhere, show the current step, and the number of kilometers built

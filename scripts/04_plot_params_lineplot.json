@@ -1,10 +1,10 @@
 {
-    "order":["coverage", "adaptive_coverage", "directness", "relative_directness", "betweenness","closeness", "random", "real", "manual"],
-    "label":["Coverage", "Adaptive coverage", "Directness", "Relative directness", "Betweenness","Closeness", "Random", "Real", "Manual"],
-    "color":["#0173b2", "#56b4e9", "#d55e00", "#de8f05", "#029e73", "#cc78bc", "#949494", "black", "black"],
-    "marker":["^", "v", "s", "D", "h", "p", "o", "*", "X"],
-    "alpha":[0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.5, 1, 1],
-    "markersize":[3, 3, 1.5, 2, 2, 2, 2, 10, 2],
+    "order":["coverage", "adaptive_coverage", "directness", "relative_directness", "betweenness","closeness", "random", "real", "directness_alt", "manual"],
+    "label":["Coverage", "Adaptive coverage", "Directness", "Relative directness", "Betweenness","Closeness", "Random", "Real", "Directness (alt)", "Manual"],
+    "color":["#0173b2", "#56b4e9", "#d55e00", "#de8f05", "#029e73", "#cc78bc", "#949494", "black", "red", "black"],
+    "marker":["^", "v", "s", "D", "h", "p", "o", "*", "d", "X"],
+    "alpha":[0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.5, 1, 0.9, 1],
+    "markersize":[3, 3, 1.5, 2, 2, 2, 2, 10, 3, 2],
     "figsize":[11.69, 8.27],
     "rcparams":{
         "font.size":10,

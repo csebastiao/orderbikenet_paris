@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 
 
 FOLDEROOTS = "./data/processed/paris_simplified_results/"
+# Need to be all timestamps by definition
 TIMESTAMPS = [
     "2021-01-01",
     "2023-05-17",
@@ -37,6 +38,7 @@ def main():
     for met_growth, cmap in {
         "coverage": mpl.colormaps["Blues"],
         "directness": mpl.colormaps["Oranges"],
+        "directness_alt": mpl.colormaps["Reds"],
         "betweenness": mpl.colormaps["Greens"],
     }.items():
         for met_plot, met_label in {

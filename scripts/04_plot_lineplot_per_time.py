@@ -36,26 +36,25 @@ def main():
         os.makedirs(folderplot)
     for t in TIMESTAMPS:
         foldertime = FOLDEROOTS + t + "/"
-        if t != "No":
-            size = 8
-        else:
-            size = 9
         avg = {}
-        for met in plot_params["order"][:size]:
-            foldermet = foldertime + met
-            if met != "real" and met != "manual":
-                foldermet += "_additive_connected"
-                if t != "No":
-                    foldermet += "_built"
-            foldermet += "/"
-            if met == "random":
-                df_concat = pd.DataFrame()
-                for i in range(RAND_TRIAL_NUMBER):
-                    df = pd.read_json(foldermet + f"metrics_growth_{i:02}.json")
-                    df_concat = pd.concat([df_concat, df])
+        for met in plot_params["order"]:
+            if t != "No" and met == "manual":
+                pass
             else:
-                df_concat = pd.read_json(foldermet + "metrics_growth.json")
-            avg[met] = pd.DataFrame(average_x(df_concat))
+                foldermet = foldertime + met
+                if met != "real" and met != "manual":
+                    foldermet += "_additive_connected"
+                    if t != "No":
+                        foldermet += "_built"
+                foldermet += "/"
+                if met == "random":
+                    df_concat = pd.DataFrame()
+                    for i in range(RAND_TRIAL_NUMBER):
+                        df = pd.read_json(foldermet + f"metrics_growth_{i:02}.json")
+                        df_concat = pd.concat([df_concat, df])
+                else:
+                    df_concat = pd.read_json(foldermet + "metrics_growth.json")
+                avg[met] = pd.DataFrame(average_x(df_concat))
         for met_plot, met_label in {
             "coverage": "Coverage ($km^2$)",
             "directness": "Directness",
@@ -71,17 +70,20 @@ def main():
             else:
                 ratio = 1
             ax.set_ylabel(met_label)
-            for ids, met in enumerate(plot_params["order"][:size]):
-                df = avg[met]
-                ax.plot(
-                    df["xx"] / 10**3,
-                    df[met_plot] / ratio,
-                    **{
-                        key: val[ids]
-                        for key, val in plot_params.items()
-                        if key not in ["dpi", "figsize", "rcparams", "order"]
-                    },
-                )
+            for ids, met in enumerate(plot_params["order"]):
+                if t != "No" and met == "manual":
+                    pass
+                else:
+                    df = avg[met]
+                    ax.plot(
+                        df["xx"] / 10**3,
+                        df[met_plot] / ratio,
+                        **{
+                            key: val[ids]
+                            for key, val in plot_params.items()
+                            if key not in ["dpi", "figsize", "rcparams", "order"]
+                        },
+                    )
             ax.set_xlabel("Built length ($km$)")
             ax.set_axisbelow(True)
             plt.tight_layout()

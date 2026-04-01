@@ -28,6 +28,7 @@ METRIC_LIST = [
     "coverage",
     "relative_directness",
     "directness",
+    "directness_alt",
     "betweenness",
     "closeness",
     "random",
