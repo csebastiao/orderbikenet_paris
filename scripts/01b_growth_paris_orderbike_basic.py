@@ -57,89 +57,92 @@ def main():
             "additive",
             "subtractive",
         ]:
-            for metric_name in [
-                # "adaptive_coverage",
-                # "coverage",
-                # "directness",
-                # "relative_directness",
-                "directness_alt"
-            ]:
-                log.info(
-                    f"Start computation for metric {metric_name}, order {order_name}"
-                )
-                if metric_name == "coverage":
-                    kwargs = {"buff_size": BUFF_SIZE}
-                elif metric_name == "adaptive_coverage":
-                    kwargs = {"max_buff": BUFF_SIZE * 2, "min_buff": BUFF_SIZE / 2}
-                else:
-                    kwargs = {}
-                foldername = (
-                    foldertime + "/" + metric_name + "_" + order_name + "_connected"
-                )
-                if built:
-                    foldername += "_built"
-                if not os.path.exists(foldername):
-                    os.makedirs(foldername)
-                metrics_dict, order_growth = growth.order_dynamic_network_growth(
-                    H,
-                    built=built,
-                    keep_connected=True,
-                    order=order_name,
-                    metric=metric_name,
-                    progress_bar=False,
-                    save_metrics=True,
-                    buff_size_metrics=BUFF_SIZE,
-                    **kwargs,
-                )
-                with open(foldername + "/order_growth.json", "w") as f:
-                    json.dump(order_growth, f)
-                with open(foldername + "/metrics_growth.json", "w") as f:
-                    json.dump(metrics_dict, f)
-            # for metric_name in ranking_func:
-            #     log.info(
-            #         f"Start computation for metric {metric_name}, order {order_name}"
-            #     )
-            #     foldername = (
-            #         foldertime + "/" + metric_name + "_" + order_name + "_connected"
-            #     )
-            #     if built:
-            #         foldername += "_built"
-            #     if not os.path.exists(foldername):
-            #         os.makedirs(foldername)
-            #     metrics_dict, order_growth = growth.order_ranked_network_growth(
-            #         H,
-            #         built=built,
-            #         keep_connected=True,
-            #         order=order_name,
-            #         ranking_func=ranking_func[metric_name],
-            #         save_metrics=True,
-            #         buff_size_metrics=BUFF_SIZE,
-            #     )
-            #     with open(foldername + "/order_growth.json", "w") as f:
-            #         json.dump(order_growth, f)
-            #     with open(foldername + "/metrics_growth.json", "w") as f:
-            #         json.dump(metrics_dict, f)
-            # log.info(f"Start random computation, order {order_name}")
-            # foldername = foldertime + "/" + "random_" + order_name + "_connected"
-            # if built:
-            #     foldername += "_built"
-            # if not os.path.exists(foldername):
-            #     os.makedirs(foldername)
-            # for i in range(NUM_RAND_TRIAL):
-            #     log.info(f"Start trial {i}")
-            #     metrics_dict, order_growth = growth.order_ranked_network_growth(
-            #         H,
-            #         built=built,
-            #         keep_connected=True,
-            #         order=order_name,
-            #         ranking_func=metrics.growth_random,
-            #         save_metrics=True,
-            #         buff_size_metrics=BUFF_SIZE,
-            #     )
-            #     with open(foldername + f"/order_growth_{i:0{PAD}}.json", "w") as f:
-            #         json.dump(order_growth, f)
-            #     with open(foldername + f"/metrics_growth_{i:0{PAD}}.json", "w") as f:
-            #         json.dump(metrics_dict, f)
+            if built_val != "2021-01-01" and order_name == "subtractive":
+                pass
+            else:
+                for metric_name in [
+                    # "adaptive_coverage",
+                    # "coverage",
+                    # "directness",
+                    # "relative_directness",
+                    "directness_alt"
+                ]:
+                    log.info(
+                        f"Start computation for metric {metric_name}, order {order_name}"
+                    )
+                    if metric_name == "coverage":
+                        kwargs = {"buff_size": BUFF_SIZE}
+                    elif metric_name == "adaptive_coverage":
+                        kwargs = {"max_buff": BUFF_SIZE * 2, "min_buff": BUFF_SIZE / 2}
+                    else:
+                        kwargs = {}
+                    foldername = (
+                        foldertime + "/" + metric_name + "_" + order_name + "_connected"
+                    )
+                    if built:
+                        foldername += "_built"
+                    if not os.path.exists(foldername):
+                        os.makedirs(foldername)
+                    metrics_dict, order_growth = growth.order_dynamic_network_growth(
+                        H,
+                        built=built,
+                        keep_connected=True,
+                        order=order_name,
+                        metric=metric_name,
+                        progress_bar=False,
+                        save_metrics=True,
+                        buff_size_metrics=BUFF_SIZE,
+                        **kwargs,
+                    )
+                    with open(foldername + "/order_growth.json", "w") as f:
+                        json.dump(order_growth, f)
+                    with open(foldername + "/metrics_growth.json", "w") as f:
+                        json.dump(metrics_dict, f)
+                # for metric_name in ranking_func:
+                #     log.info(
+                #         f"Start computation for metric {metric_name}, order {order_name}"
+                #     )
+                #     foldername = (
+                #         foldertime + "/" + metric_name + "_" + order_name + "_connected"
+                #     )
+                #     if built:
+                #         foldername += "_built"
+                #     if not os.path.exists(foldername):
+                #         os.makedirs(foldername)
+                #     metrics_dict, order_growth = growth.order_ranked_network_growth(
+                #         H,
+                #         built=built,
+                #         keep_connected=True,
+                #         order=order_name,
+                #         ranking_func=ranking_func[metric_name],
+                #         save_metrics=True,
+                #         buff_size_metrics=BUFF_SIZE,
+                #     )
+                #     with open(foldername + "/order_growth.json", "w") as f:
+                #         json.dump(order_growth, f)
+                #     with open(foldername + "/metrics_growth.json", "w") as f:
+                #         json.dump(metrics_dict, f)
+                # log.info(f"Start random computation, order {order_name}")
+                # foldername = foldertime + "/" + "random_" + order_name + "_connected"
+                # if built:
+                #     foldername += "_built"
+                # if not os.path.exists(foldername):
+                #     os.makedirs(foldername)
+                # for i in range(NUM_RAND_TRIAL):
+                #     log.info(f"Start trial {i}")
+                #     metrics_dict, order_growth = growth.order_ranked_network_growth(
+                #         H,
+                #         built=built,
+                #         keep_connected=True,
+                #         order=order_name,
+                #         ranking_func=metrics.growth_random,
+                #         save_metrics=True,
+                #         buff_size_metrics=BUFF_SIZE,
+                #     )
+                #     with open(foldername + f"/order_growth_{i:0{PAD}}.json", "w") as f:
+                #         json.dump(order_growth, f)
+                #     with open(foldername + f"/metrics_growth_{i:0{PAD}}.json", "w") as f:
+                #         json.dump(metrics_dict, f)
     log.info("Finished !")
 
 

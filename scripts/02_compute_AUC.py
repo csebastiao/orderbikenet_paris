@@ -23,6 +23,17 @@ TIMESTAMPS = [
     "2025-06-02",
     "No",
 ]
+METRIC_LIST = [
+    "adaptive_coverage",
+    "coverage",
+    "relative_directness",
+    "directness",
+    "betweenness",
+    "closeness",
+    "random",
+    "real",
+    "manual",
+]
 
 
 def main():
@@ -31,17 +42,7 @@ def main():
         for idx, t in enumerate(TIMESTAMPS):
             foldertime = FOLDEROOTS + t + "/"
             # Open for all growth strategies for a toy graph
-            for metric in [
-                "adaptive_coverage",
-                "coverage",
-                "relative_directness",
-                "directness",
-                "betweenness",
-                "closeness",
-                "random",
-                "real",
-                "manual",
-            ]:
+            for metric in METRIC_LIST:
                 if t != "No" and metric == "manual":
                     pass
                 else:

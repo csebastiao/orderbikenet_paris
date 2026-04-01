@@ -79,7 +79,7 @@ def main():
                         fmt="o",
                         **{key: val for key, val in plot_params["errorbar"].items()},
                     )
-            ax.set_xlabel("AUC of directness")
+            ax.set_xlabel(X_CHOICE)
             ax.set_ylabel("AUC of coverage")
             savename = folderplot + f"/AUC_comparison_cov_dir_{t}"
             if exp:
