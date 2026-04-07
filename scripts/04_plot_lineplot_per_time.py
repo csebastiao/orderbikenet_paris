@@ -52,9 +52,10 @@ def main():
                     for i in range(RAND_TRIAL_NUMBER):
                         df = pd.read_json(foldermet + f"metrics_growth_{i:02}.json")
                         df_concat = pd.concat([df_concat, df])
+                    df_avg = pd.DataFrame(average_x(df_concat))
                 else:
-                    df_concat = pd.read_json(foldermet + "metrics_growth.json")
-                avg[met] = pd.DataFrame(average_x(df_concat))
+                    df_avg = pd.read_json(foldermet + "metrics_growth.json")
+                avg[met] = df_avg
         for met_plot, met_label in {
             "coverage": "Coverage ($km^2$)",
             "directness": "Directness",

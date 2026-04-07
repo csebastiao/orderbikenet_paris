@@ -23,7 +23,6 @@ TIMESTAMPS = [
     "2025-06-02",
     "No",
 ]
-X_CHOICE = "AUC of Directness"
 
 
 def main():
@@ -50,7 +49,7 @@ def main():
                     else:
                         mask_met = df_growth["Metric optimized"] == met
                         ax.scatter(
-                            df_growth[mask_tim & mask_met][X_CHOICE],
+                            df_growth[mask_tim & mask_met][x_choice],
                             df_growth[mask_tim & mask_met]["AUC of Coverage"],
                             zorder=2,
                             **{
@@ -67,8 +66,8 @@ def main():
                             },
                         )
                         if met == "random":
-                            xx_mean = df_growth[mask_tim & mask_met][X_CHOICE].mean()
-                            xx_std = df_growth[mask_tim & mask_met][X_CHOICE].std()
+                            xx_mean = df_growth[mask_tim & mask_met][x_choice].mean()
+                            xx_std = df_growth[mask_tim & mask_met][x_choice].std()
                             yy_mean = df_growth[mask_tim & mask_met][
                                 "AUC of Coverage"
                             ].mean()
@@ -86,10 +85,10 @@ def main():
                                     for key, val in plot_params["errorbar"].items()
                                 },
                             )
-                ax.set_xlabel(X_CHOICE)
+                ax.set_xlabel(x_choice)
                 ax.set_ylabel("AUC of coverage")
                 savename = folderplot + "/AUC_comparison_cov_dir"
-                if X_CHOICE == "AUC of Directness (alt)":
+                if x_choice == "AUC of Directness (alt)":
                     savename += "_alt"
                 savename += f"_{t}"
                 if exp:
@@ -100,8 +99,8 @@ def main():
                 ax.yaxis.set_major_locator(loc)
                 plt.axis("square")
                 # Set rounded limits at smallest and highest 0.1
-                dirmin = df_growth[mask_tim][X_CHOICE].min()
-                dirmax = df_growth[mask_tim][X_CHOICE].max()
+                dirmin = df_growth[mask_tim][x_choice].min()
+                dirmax = df_growth[mask_tim][x_choice].max()
                 covmin = df_growth[mask_tim]["AUC of Coverage"].min()
                 covmax = df_growth[mask_tim]["AUC of Coverage"].max()
                 mmin = round(min(dirmin, covmin) - 0.05, 1)
@@ -112,14 +111,14 @@ def main():
                 parfront = parfront[
                     parfront.apply(
                         lambda x: is_pareto_efficient(
-                            x, parfront, "AUC of Coverage", X_CHOICE
+                            x, parfront, "AUC of Coverage", x_choice
                         ),
                         axis=1,
                     )
                 ]
-                parfront.sort_values(X_CHOICE, axis=0, inplace=True)
+                parfront.sort_values(x_choice, axis=0, inplace=True)
                 ax.plot(
-                    parfront[X_CHOICE],
+                    parfront[x_choice],
                     parfront["AUC of Coverage"],
                     linestyle="dashed",
                     linewidth=1,
