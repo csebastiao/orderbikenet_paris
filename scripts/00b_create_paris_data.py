@@ -4,14 +4,48 @@ Create paris demographics processed files from raw files.
 """
 
 import os
-import geopandas as gpd
+import numpy as np
 import pandas as pd
 import shapely
+from libpysal import weights
+import geopandas as gpd
 import osmnx as ox
 
 FOLDER_IN = "./data/raw/official_data/"
 FOLDER_OUT = "./data/processed/paris_official_data/"
 BUFF_SIZE = 400
+MET_LIST = [
+    "median_income",
+    "poverty_rate",
+    "commuter_cyclist_share",
+    "commuter_driver_share",
+]
+ALIGNMENT_NUANCES = {
+    "LEXG": 0,
+    "LCOM": 1,
+    "LFI": 2,
+    "LSOC": 3,
+    "LRDG": 4,
+    "LDVG": 5,
+    "LUG": 6,
+    "LVEC": 7,
+    "LECO": 8,
+    "LDIV": 9,
+    "LREG": 10,
+    "LGJ": 11,
+    "LREM": 12,
+    "LMDM": 13,
+    "LUDI": 14,
+    "LUC": 15,
+    "LDVC": 16,
+    "LLR": 17,
+    "LUD": 18,
+    "LDVD": 19,
+    "LDLF": 20,
+    "LRN": 21,
+    "LEXD": 22,
+    "LNC": 99,
+}
 
 
 def main():
@@ -120,34 +154,8 @@ def main():
         "LUC",
     ]
     candidates = {name: nuance for name, nuance in zip(names, nuances)}
-    alignment_nuances = {
-        "LEXG": 0,
-        "LCOM": 1,
-        "LFI": 2,
-        "LSOC": 3,
-        "LRDG": 4,
-        "LDVG": 5,
-        "LUG": 6,
-        "LVEC": 7,
-        "LECO": 8,
-        "LDIV": 9,
-        "LREG": 10,
-        "LGJ": 11,
-        "LREM": 12,
-        "LMDM": 13,
-        "LUDI": 14,
-        "LUC": 15,
-        "LDVC": 16,
-        "LLR": 17,
-        "LUD": 18,
-        "LDVD": 19,
-        "LDLF": 20,
-        "LRN": 21,
-        "LEXD": 22,
-        "LNC": 99,
-    }
     df_alignment_nuances = pd.DataFrame.from_dict(
-        alignment_nuances, orient="index", columns=["Value"]
+        ALIGNMENT_NUANCES, orient="index", columns=["Value"]
     )
     df_alignment_nuances.to_json(FOLDER_OUT + "vote_alignment_nuances.json")
     gdf_paris_voting_stations = gpd.read_file(
@@ -215,10 +223,10 @@ def main():
     ]
     # TODO find way to remove settingwithcopywarning
     gdf_small["DISP_TP6021"] = gdf_small["DISP_TP6021"].apply(
-        lambda x: -1 if "n" in x else int(float(x.replace(",", ".")))
+        lambda x: np.nan if "n" in x else int(float(x.replace(",", ".")))
     )
     gdf_small["DISP_MED21"] = gdf_small["DISP_MED21"].apply(
-        lambda x: -1 if "n" in x else int(float(x.replace(",", ".")))
+        lambda x: np.nan if "n" in x else int(float(x.replace(",", ".")))
     )
     gdf_small["commuter_cyclist_share"] = (
         gdf_small.C21_ACTOCC15P_VELO / gdf_small.C21_ACTOCC15P
@@ -236,8 +244,24 @@ def main():
         axis=1,
     )
     gdf_small = gdf_small.drop(["C21_ACTOCC15P_VELO", "C21_ACTOCC15P_VOIT"], axis=1)
+    # Replace na values for columns in MET_LIST by the average values of the k nearest neighbors with values
+    gdf_small_na = gdf_small[gdf_small["median_income"].isna()]
+    gdf_small_notna = gdf_small[gdf_small["median_income"].notna()]
+    change_dict = {met: {} for met in MET_LIST}
+    for idx, row in gdf_small_na.iterrows():
+        gdf_iris_temp = gdf_small_notna.copy()
+        gdf_iris_temp.loc[-1] = row
+        W = weights.KNN.from_dataframe(gdf_iris_temp, use_index=True, k=8)
+        W.transform = "r"
+        for met in MET_LIST:
+            change_dict[met][idx] = weights.lag_spatial(
+                W, gdf_iris_temp[met].fillna(0).values
+            )[-1]
+    for met in MET_LIST:
+        gdf_small[met] = gdf_small[met].fillna(change_dict[met])
+    gdf_small["median_income"] = gdf_small["median_income"].map(round)
+    gdf_small["poverty_rate"] = gdf_small["poverty_rate"].map(round)
     gdf_small.to_file(FOLDER_OUT + "paris_dem_iris_condensed.gpkg")
-    # TODO make smaller version with relevant columns and clearer column names
     gdf_paris_vote_list = gpd.GeoDataFrame(
         gdf_paris_vote.rename(candidates, axis=1)
         .T.groupby(level=0, by=set(nuances))
@@ -267,7 +291,6 @@ def main():
         )
     gdf_paris_vote_list.to_file(FOLDER_OUT + "paris_vote_list.gpkg")
     gdf_businesses_apur = gpd.read_file(FOLDER_IN + "APUR_businesses_2020.geojson")
-    # TODO make some changes for clarity
     gdf_businesses_apur.to_file(FOLDER_OUT + "paris_businesses_apur.gpkg")
 
 
