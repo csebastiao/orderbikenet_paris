@@ -12,14 +12,14 @@ FOLDEROOTS = "./data/processed/paris_simplified_results/"
 FILENAME = "paris_cleaned_multigraph.graphml"
 TIMESTAMPS = [
     "2021-01-01",
-    # "2023-05-17",
-    # "2023-10-01",
-    # "2024-01-15",
-    # "2024-04-04",
-    # "2024-08-22",
-    # "2024-12-22",
-    # "2025-06-02",
-    # "No",
+    "2023-05-17",
+    "2023-10-01",
+    "2024-01-15",
+    "2024-04-04",
+    "2024-08-22",
+    "2024-12-22",
+    "2025-06-02",
+    "No",
 ]
 BUFF_SIZE = 400
 BUFFER = True
@@ -32,7 +32,8 @@ MET_LIST = [
     # "directness",
     # "betweenness",
     # "closeness",
-    "directness_alt",
+    # "directness_alt",
+    "manual",
 ]
 
 # TODO add a way to plot also all relevant metrics below or somewhere, show the current step, and the number of kilometers built
@@ -59,36 +60,39 @@ def main():
         if not os.path.exists(foldertimeplot):
             os.makedirs(foldertimeplot)
         for met in MET_LIST:
-            foldermet = foldertime + met + "_additive_connected"
-            if t != "No":
-                foldermet += "_built"
-            foldermet += "/"
-            foldermetplot = foldertimeplot + met + "/"
-            if not os.path.exists(foldermetplot):
-                os.makedirs(foldermetplot)
-            with open(foldermet + "order_growth.json") as f:
-                order_growth = json.load(f)
-            order_growth = [tuple(val) for val in order_growth]
-            with open(foldermet + "metrics_growth.json") as f:
-                metrics_dict = json.load(f)
-            plot_growth(
-                H,
-                order_growth,
-                foldermetplot,
-                built=built,
-                color_built="firebrick",
-                color_added="steelblue",
-                color_newest="darkgreen",
-                node_size=8,
-                buffer=BUFFER,
-                buff_size=BUFF_SIZE,
-                plot_metrics=PLOT_METRICS,
-                growth_cov=metrics_dict["coverage"],
-                growth_xx=metrics_dict["xx"],
-                growth_dir=metrics_dict["directness"],
-                growth_reldir=metrics_dict["relative_directness"],
-                dpi=DPI,
-            )
+            if met == "manual" and t != "No":
+                pass
+            else:
+                foldermet = foldertime + met + "_additive_connected"
+                if t != "No":
+                    foldermet += "_built"
+                foldermet += "/"
+                foldermetplot = foldertimeplot + met + "/"
+                if not os.path.exists(foldermetplot):
+                    os.makedirs(foldermetplot)
+                with open(foldermet + "order_growth.json") as f:
+                    order_growth = json.load(f)
+                order_growth = [tuple(val) for val in order_growth]
+                with open(foldermet + "metrics_growth.json") as f:
+                    metrics_dict = json.load(f)
+                plot_growth(
+                    H,
+                    order_growth,
+                    foldermetplot,
+                    built=built,
+                    color_built="firebrick",
+                    color_added="steelblue",
+                    color_newest="darkgreen",
+                    node_size=8,
+                    buffer=BUFFER,
+                    buff_size=BUFF_SIZE,
+                    plot_metrics=PLOT_METRICS,
+                    growth_cov=metrics_dict["coverage"],
+                    growth_xx=metrics_dict["xx"],
+                    growth_dir=metrics_dict["directness"],
+                    growth_reldir=metrics_dict["relative_directness"],
+                    dpi=DPI,
+                )
     # Plot real growth
     folderrealplot = folderplot + "real/"
     if not os.path.exists(folderrealplot):

@@ -22,7 +22,7 @@ def main():
     folderplots = FOLDER_DATA + "plots/"
     if not os.path.exists(folderplots):
         os.makedirs(folderplots)
-    gdf_pop = gpd.read_file(FOLDER_DATA + "paris_dem_iris_condensed.gpkg")
+    gdf_pop = gpd.read_file(FOLDER_DATA + "paris_dem_iris_condensed_enriched.gpkg")
     for column_name, cmap in {
         "population": "inferno",
         "pop_density": "inferno",
@@ -30,6 +30,8 @@ def main():
         "median_income": "Greens",
         "commuter_cyclist_share": "Greens",
         "commuter_driver_share": "Reds",
+        "Restauration": "inferno",
+        "Restauration_density": "inferno",
     }.items():
         fig, ax = plt.subplots(layout="constrained")
         gdf_pop.plot(

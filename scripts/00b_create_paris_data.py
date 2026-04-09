@@ -290,6 +290,8 @@ def main():
             gdf_paris_vote_list[col] / gdf_paris_vote_list["NB_EXPRIM"]
         )
     gdf_paris_vote_list.to_file(FOLDER_OUT + "paris_vote_list.gpkg")
+    gdf_paris_vote_arr = gdf_paris_vote_list.dissolve(by="NUM_ARROND")
+    gdf_paris_vote_arr.to_file(FOLDER_OUT + "paris_vote_arr.gpkg")
     gdf_businesses_apur = gpd.read_file(FOLDER_IN + "APUR_businesses_2020.geojson")
     gdf_businesses_apur.to_file(FOLDER_OUT + "paris_businesses_apur.gpkg")
 
