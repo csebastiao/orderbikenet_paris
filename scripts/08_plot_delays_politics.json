@@ -1,0 +1,30 @@
+{
+    "party":["LUG_share", "LUD_share"],
+    "label":["LUG (Left-wing)", "LUD (Right-wing)"],
+    "color":["#E53935", "#1E88E5"],
+    "marker":["o", "s"],
+    "cmap":"inferno",
+    "scheme":"fisher_jenks",
+    "alpha":[1, 1],
+    "markersize":[10, 10],
+    "figsize":[11.69, 8.27],
+    "rcparams":{
+        "font.size":10,
+        "font.family": "sans-serif",
+        "font.sans-serif": "Arial",
+        "axes.grid":"False",
+        "axes.spines.right": "False",
+        "axes.spines.top": "False",
+        "axes.axisbelow": "True",
+        "grid.color": "E1E1E1",
+        "xtick.bottom": "True",
+        "ytick.left": "True",
+        "figure.frameon": "False",
+        "figure.dpi": 400,
+        "savefig.bbox": "tight",
+        "legend.loc": "upper right",
+        "legend.edgecolor": "white",
+        "legend.facecolor": "white",
+        "errorbar.capsize": 4
+    }
+}
