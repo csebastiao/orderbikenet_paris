@@ -13,7 +13,9 @@ FOLDER_DATA = "./data/processed/paris_official_data/"
 PARTY_DICT = {
     "LUC": "Purples",
     "LUD": "Blues",
-    "LUG": "Reds",
+    "LUG": "Oranges",
+    "LFI": "Reds",
+    "LEXD": "Greys",
 }
 DPI = 300
 
@@ -22,7 +24,7 @@ def main():
     folderplots = FOLDER_DATA + "plots/"
     if not os.path.exists(folderplots):
         os.makedirs(folderplots)
-    gdf_pop = gpd.read_file(FOLDER_DATA + "paris_dem_iris_condensed_enriched.gpkg")
+    gdf_pop = gpd.read_file(FOLDER_DATA + "paris_dem_iris_2021_condensed_enriched.gpkg")
     for column_name, cmap in {
         "population": "inferno",
         "pop_density": "inferno",
@@ -39,21 +41,27 @@ def main():
         )
         ax.axis("off")
         fig.savefig(folderplots + "Paris_" + column_name + "_IRIS.png", dpi=DPI)
-    gdf_vote = gpd.read_file(FOLDER_DATA + "paris_vote_list.gpkg")
-    for party, color in PARTY_DICT.items():
-        fig, ax = plt.subplots(layout="constrained")
-        gdf_vote.plot(
-            ax=ax,
-            column=party + "_share",
-            cmap=color,
-            vmin=0,
-            vmax=1,
-            edgecolor="black",
-            linewidth=0.1,
-            legend=True,
-        )
-        ax.axis("off")
-        fig.savefig(folderplots + "Paris_vote_" + party + ".png", dpi=DPI)
+    for year in ["2020", "2026"]:
+        gdf_vote = gpd.read_file(FOLDER_DATA + f"paris_vote_list_{year}.gpkg")
+        for party, color in PARTY_DICT.items():
+            if party not in gdf_vote.columns:
+                pass
+            else:
+                fig, ax = plt.subplots(layout="constrained")
+                gdf_vote.plot(
+                    ax=ax,
+                    column=party + "_share",
+                    cmap=color,
+                    vmin=0,
+                    vmax=1,
+                    edgecolor="black",
+                    linewidth=0.1,
+                    legend=True,
+                )
+                ax.axis("off")
+                fig.savefig(
+                    folderplots + "Paris_vote_" + year + "_" + party + ".png", dpi=DPI
+                )
     gdf_metro = gpd.read_file(FOLDER_DATA + "idf_metro.gpkg")
     fig, ax = plt.subplots(layout="constrained")
     gpd.GeoDataFrame(geometry=[gdf_vote.union_all()], crs=gdf_vote.crs).boundary.plot(

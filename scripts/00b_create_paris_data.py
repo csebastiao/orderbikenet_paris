@@ -20,7 +20,7 @@ MET_LIST = [
     "commuter_cyclist_share",
     "commuter_driver_share",
 ]
-ALIGNMENT_NUANCES = {
+ALIGNMENT_NUANCES_2020 = {
     "LEXG": 0,
     "LCOM": 1,
     "LFI": 2,
@@ -46,11 +46,39 @@ ALIGNMENT_NUANCES = {
     "LEXD": 22,
     "LNC": 99,
 }
+ALIGNMENT_NUANCES_2026 = {
+    "LEXG": 0,
+    "LFI": 1,
+    "LCOM": 2,
+    "LSOC": 3,
+    "LVEC": 4,
+    "LUG": 5,
+    "LDVG": 6,
+    "LECO": 7,
+    "LREG": 8,
+    "LDIV": 9,
+    "LREN": 10,
+    "LMDM": 11,
+    "LHOR": 12,
+    "LUDI": 13,
+    "LUC": 14,
+    "LDVC": 15,
+    "LLR": 16,
+    "LUD": 17,
+    "LDVD": 18,
+    "LDSV": 19,
+    "LUDR": 20,
+    "LRN": 21,
+    "LREC": 22,
+    "LUXD": 23,
+    "LEXD": 24,
+}
 
 
 def main():
     if not os.path.exists(FOLDER_OUT):
         os.makedirs(FOLDER_OUT)
+    # Make voting results for 2020
     li = []
     for i in range(1, 21):
         if i == 7:
@@ -155,9 +183,13 @@ def main():
     ]
     candidates = {name: nuance for name, nuance in zip(names, nuances)}
     df_alignment_nuances = pd.DataFrame.from_dict(
-        ALIGNMENT_NUANCES, orient="index", columns=["Value"]
+        ALIGNMENT_NUANCES_2020, orient="index", columns=["Value"]
     )
-    df_alignment_nuances.to_json(FOLDER_OUT + "vote_alignment_nuances.json")
+    df_alignment_nuances.to_json(FOLDER_OUT + "vote_alignment_nuances_2020.json")
+    df_alignment_nuances = pd.DataFrame.from_dict(
+        ALIGNMENT_NUANCES_2026, orient="index", columns=["Value"]
+    )
+    df_alignment_nuances.to_json(FOLDER_OUT + "vote_alignment_nuances_2026.json")
     gdf_paris_voting_stations = gpd.read_file(
         FOLDER_IN + "votingparis_geometry_2020.geojson"
     )
@@ -207,7 +239,7 @@ def main():
     gdf_paris_iris_all = gdf_paris_iris_pop_income.merge(
         df_iris_activity, on="CODE_IRIS"
     )
-    gdf_paris_iris_all.to_file(FOLDER_OUT + "paris_dem_iris.gpkg")
+    gdf_paris_iris_all.to_file(FOLDER_OUT + "paris_dem_iris_2021.gpkg")
     gdf_small = gdf_paris_iris_all[
         [
             "CODE_IRIS",
@@ -261,7 +293,7 @@ def main():
         gdf_small[met] = gdf_small[met].fillna(change_dict[met])
     gdf_small["median_income"] = gdf_small["median_income"].map(round)
     gdf_small["poverty_rate"] = gdf_small["poverty_rate"].map(round)
-    gdf_small.to_file(FOLDER_OUT + "paris_dem_iris_condensed.gpkg")
+    gdf_small.to_file(FOLDER_OUT + "paris_dem_iris_2021_condensed.gpkg")
     gdf_paris_vote_list = gpd.GeoDataFrame(
         gdf_paris_vote.rename(candidates, axis=1)
         .T.groupby(level=0, by=set(nuances))
@@ -289,11 +321,62 @@ def main():
         gdf_paris_vote_list[col + "_share"] = (
             gdf_paris_vote_list[col] / gdf_paris_vote_list["NB_EXPRIM"]
         )
-    gdf_paris_vote_list.to_file(FOLDER_OUT + "paris_vote_list.gpkg")
+    gdf_paris_vote_list.to_file(FOLDER_OUT + "paris_vote_list_2020.gpkg")
     gdf_paris_vote_arr = gdf_paris_vote_list.dissolve(by="NUM_ARROND")
-    gdf_paris_vote_arr.to_file(FOLDER_OUT + "paris_vote_arr.gpkg")
+    gdf_paris_vote_arr.to_file(FOLDER_OUT + "paris_vote_arr_2020.gpkg")
     gdf_businesses_apur = gpd.read_file(FOLDER_IN + "APUR_businesses_2020.geojson")
-    gdf_businesses_apur.to_file(FOLDER_OUT + "paris_businesses_apur.gpkg")
+    gdf_businesses_apur.to_file(FOLDER_OUT + "paris_businesses_apur_2020.gpkg")
+    # Make voting results for 2026
+    df_fr = pd.read_csv(
+        FOLDER_IN + "votingarr_values_2026/arrondissements_firstround_2026.csv",
+        delimiter=";",
+    )
+    df_fr = df_fr[df_fr["Code département"] == 75]
+    df_sr = pd.read_csv(
+        FOLDER_IN + "votingarr_values_2026/arrondissements_secondround_2026.csv",
+        delimiter=";",
+    )
+    df_sr = df_sr[df_sr["Code département"] == 75]
+    df_all = pd.concat([df_sr, df_fr[~df_fr["Code BV"].isin(df_sr["Code BV"].values)]])
+    gdf_sta = gpd.read_file(FOLDER_IN + "votingparis_geometry_2026.geojson")
+    gdf_sta["Code BV"] = gdf_sta.apply(
+        lambda df: int(str(df.arrondissement) + str(df.num_bv).zfill(2)), axis=1
+    )
+    gdf_vote_sta = gdf_sta.merge(df_all, on="Code BV")
+    party_paris = {
+        x
+        for x in set.union(
+            *[set(gdf_vote_sta[f"Nuance liste {i}"].values) for i in range(1, 12)]
+        )
+        if pd.notna(x)
+    }
+    gdf_cleaned = gdf_vote_sta.copy()
+    for idx, row in gdf_vote_sta.iterrows():
+        for i in range(1, 12):
+            if pd.notna(row[f"Nuance liste {i}"]):
+                gdf_cleaned.loc[idx, row[f"Nuance liste {i}"]] = row[f"Voix {i}"]
+    gdf_cleaned = gdf_cleaned.fillna(0)
+    for p in party_paris:
+        gdf_cleaned[p + "_share"] = gdf_cleaned[p] / gdf_cleaned["Exprimés"]
+    gdf_cleaned = gdf_cleaned[
+        [
+            "arrondissement",
+            "num_bv",
+            "geometry",
+            "Code BV",
+            "Votants",
+            "Exprimés",
+            "Inscrits",
+            "Blancs",
+            "Abstentions",
+        ]
+        + [p for p in party_paris]
+        + [p + "_share" for p in party_paris]
+    ]
+    gdf_cleaned = gdf_cleaned.to_crs(gdf_paris_vote_list.crs)
+    gdf_cleaned.to_file(FOLDER_OUT + "paris_vote_list_2026.gpkg")
+    gdf_cleaned_arr = gdf_cleaned.dissolve(by="arrondissement")
+    gdf_cleaned_arr.to_file(FOLDER_OUT + "paris_vote_arr_2026.gpkg")
 
 
 if __name__ == "__main__":

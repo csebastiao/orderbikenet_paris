@@ -25,9 +25,9 @@ BUSINESSES_TO_COUNT = [
 
 
 def main():
-    gdf_vote = gpd.read_file(FOLDEROOTS + "paris_vote_list.gpkg")
-    gdf_iris = gpd.read_file(FOLDEROOTS + "paris_dem_iris_condensed.gpkg")
-    gdf_apur = gpd.read_file(FOLDEROOTS + "paris_businesses_apur.gpkg")
+    gdf_vote = gpd.read_file(FOLDEROOTS + "paris_vote_list_2020.gpkg")
+    gdf_iris = gpd.read_file(FOLDEROOTS + "paris_dem_iris_2021_condensed.gpkg")
+    gdf_apur = gpd.read_file(FOLDEROOTS + "paris_businesses_apur_2020.gpkg")
     gdf_iris = gdf_iris.to_crs(gdf_vote.crs)
     # Add values from gdf_vote
     for met in MET_LIST:
@@ -50,7 +50,7 @@ def main():
         gdf_iris.loc[list(set(gdf_filtered.index)), bus] = gdf_filtered.values
         gdf_iris[bus + "_density"] = gdf_iris[bus] / (gdf_iris.geometry.area / 10**6)
     gdf_iris = gdf_iris.to_crs(epsg=4326)
-    gdf_iris.to_file(FOLDEROOTS + "paris_dem_iris_condensed_enriched.gpkg")
+    gdf_iris.to_file(FOLDEROOTS + "paris_dem_iris_2021_condensed_enriched.gpkg")
 
 
 def transfer_values(gdf_to, gdf_from, metric_name, count=True, batch_size=10000):
