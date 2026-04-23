@@ -62,6 +62,20 @@ def main():
                 fig.savefig(
                     folderplots + "Paris_vote_" + year + "_" + party + ".png", dpi=DPI
                 )
+    gdf_vote = gpd.read_file(FOLDER_DATA + "paris_vote_arr_2020.gpkg")
+    fig, ax = plt.subplots(layout="constrained")
+    gdf_vote.plot(
+        ax=ax,
+        column="ratio_LR",
+        cmap="bwr_r",
+        vmin=-0.9,
+        vmax=0.9,
+        edgecolor="black",
+        linewidth=0.1,
+        legend=True,
+    )
+    ax.axis("off")
+    fig.savefig(folderplots + "Paris_vote_2020_LR.png", dpi=DPI)
     gdf_metro = gpd.read_file(FOLDER_DATA + "idf_metro.gpkg")
     fig, ax = plt.subplots(layout="constrained")
     gpd.GeoDataFrame(geometry=[gdf_vote.union_all()], crs=gdf_vote.crs).boundary.plot(

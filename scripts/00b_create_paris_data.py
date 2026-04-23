@@ -20,6 +20,19 @@ MET_LIST = [
     "commuter_cyclist_share",
     "commuter_driver_share",
 ]
+COLS_TO_DROP = [
+    "NB_BLANC",
+    "NB_EMARG",
+    "NB_INSCR",
+    "NB_NUL",
+    "NB_PROCU",
+    "NB_VOTANT",
+    "NUM_CIRC",
+    "NUM_QUARTIER",
+    "id_bv",
+    "st_area_shape",
+    "st_perimeter_shape",
+]
 ALIGNMENT_NUANCES_2020 = {
     "LEXG": 0,
     "LCOM": 1,
@@ -317,12 +330,53 @@ def main():
     )
     for col in list(gdf_paris_vote_list.columns)[:16]:
         gdf_paris_vote_list[col] = gdf_paris_vote_list[col].map(float).map(int)
+    agg_func = {}
+    agg_func["NB_EXPRIM"] = "sum"
+    all_2020_parties = list(ALIGNMENT_NUANCES_2020.keys())
+    left_parties = []
+    right_parties = []
     for col in list(gdf_paris_vote_list.columns)[:9]:
+        if all_2020_parties.index(col) < 12:
+            left_parties.append(col)
+        elif all_2020_parties.index(col) >= 17:
+            right_parties.append(col)
+    gdf_paris_vote_list["Left_wing"] = gdf_paris_vote_list.apply(
+        lambda df: sum([df[party_name] for party_name in left_parties]), axis=1
+    )
+    gdf_paris_vote_list["Right_wing"] = gdf_paris_vote_list.apply(
+        lambda df: sum([df[party_name] for party_name in right_parties]), axis=1
+    )
+    agg_func["Left_wing"] = "sum"
+    agg_func["Right_wing"] = "sum"
+    for col in list(gdf_paris_vote_list.columns)[:9] + ["Left_wing", "Right_wing"]:
         gdf_paris_vote_list[col + "_share"] = (
             gdf_paris_vote_list[col] / gdf_paris_vote_list["NB_EXPRIM"]
         )
+        agg_func[col] = "sum"
+    rm = (
+        gdf_paris_vote_list["Right_wing"].sum() / gdf_paris_vote_list["NB_EXPRIM"].sum()
+    )
+    lm = gdf_paris_vote_list["Left_wing"].sum() / gdf_paris_vote_list["NB_EXPRIM"].sum()
+    vote_avg_ratio = rm - lm
+    gdf_paris_vote_list["ratio_LR"] = (
+        (gdf_paris_vote_list["Right_wing"] - gdf_paris_vote_list["Left_wing"])
+        / gdf_paris_vote_list["NB_EXPRIM"]
+    ) - vote_avg_ratio
+    gdf_paris_vote_list = gdf_paris_vote_list.drop(COLS_TO_DROP, axis=1)
     gdf_paris_vote_list.to_file(FOLDER_OUT + "paris_vote_list_2020.gpkg")
-    gdf_paris_vote_arr = gdf_paris_vote_list.dissolve(by="NUM_ARROND")
+    gdf_paris_vote_arr = gdf_paris_vote_list.dissolve(by="NUM_ARROND", aggfunc=agg_func)
+    for col in list(gdf_paris_vote_list.columns)[:9] + ["Left_wing", "Right_wing"]:
+        gdf_paris_vote_arr[col + "_share"] = (
+            gdf_paris_vote_arr[col] / gdf_paris_vote_arr["NB_EXPRIM"]
+        )
+        agg_func[col] = "sum"
+    rm = gdf_paris_vote_arr["Right_wing_share"].mean()
+    lm = gdf_paris_vote_arr["Left_wing_share"].mean()
+    vote_avg_ratio = rm - lm
+    gdf_paris_vote_arr["ratio_LR"] = (
+        (gdf_paris_vote_arr["Right_wing"] - gdf_paris_vote_arr["Left_wing"])
+        / gdf_paris_vote_arr["NB_EXPRIM"]
+    ) - vote_avg_ratio
     gdf_paris_vote_arr.to_file(FOLDER_OUT + "paris_vote_arr_2020.gpkg")
     gdf_businesses_apur = gpd.read_file(FOLDER_IN + "APUR_businesses_2020.geojson")
     gdf_businesses_apur.to_file(FOLDER_OUT + "paris_businesses_apur_2020.gpkg")

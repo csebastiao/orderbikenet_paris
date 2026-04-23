@@ -15,29 +15,33 @@ FOLDER_BIKE = "./data/processed/paris_simplified_results/"
 FOLDER_OFFI = "./data/processed/paris_official_data/"
 
 
+# TODO revisit the spatial smoothing method
 def main():
     G = ox.load_graphml(FOLDER_BIKE + "paris_cleaned_multigraph.graphml")
     gdf_edges = ox.graph_to_gdfs(G, edges=True, nodes=False)
     gdf_edges = gdf_edges[["geometry", "length", "built"]]
-    gdf_vote_arr = gpd.read_file(FOLDER_OFFI + "paris_vote_arr.gpkg")
-    gdf_vote_arr = gdf_vote_arr.to_crs(gdf_edges.crs)
-    gdf_vote_arr_res = add_length_to_poly(gdf_vote_arr, gdf_edges)
-    gdf_vote_arr_res.to_file(FOLDER_BIKE + "paris_vote_arr_bikenet.gpkg")
-    gdf_vote_sta = gpd.read_file(FOLDER_OFFI + "paris_vote_list.gpkg")
-    gdf_vote_sta = gdf_vote_sta.to_crs(gdf_edges.crs)
-    gdf_vote_sta_res = add_length_to_poly(gdf_vote_sta, gdf_edges)
-    centroids = np.array(
-        [[point.x, point.y] for point in gdf_vote_sta_res.geometry.centroid]
-    )
-    kdtree = KDTree(centroids)
-    gdf_vote_sta_res["length_accomplished_share_smoothed"] = spatial_smoothing_gaussian(
-        gdf_vote_sta_res["length_accomplished_share"].values,
-        centroids,
-        kdtree,
-        k=20,
-        bandwidth=200,
-    )
-    gdf_vote_sta_res.to_file(FOLDER_BIKE + "paris_vote_sta_bikenet.gpkg")
+    for year in ["2020", "2026"]:
+        gdf_vote_arr = gpd.read_file(FOLDER_OFFI + f"paris_vote_arr_{year}.gpkg")
+        gdf_vote_arr = gdf_vote_arr.to_crs(gdf_edges.crs)
+        gdf_vote_arr_res = add_length_to_poly(gdf_vote_arr, gdf_edges)
+        gdf_vote_arr_res.to_file(FOLDER_BIKE + f"paris_vote_arr_{year}_bikenet.gpkg")
+        gdf_vote_sta = gpd.read_file(FOLDER_OFFI + f"paris_vote_list_{year}.gpkg")
+        gdf_vote_sta = gdf_vote_sta.to_crs(gdf_edges.crs)
+        gdf_vote_sta_res = add_length_to_poly(gdf_vote_sta, gdf_edges)
+        centroids = np.array(
+            [[point.x, point.y] for point in gdf_vote_sta_res.geometry.centroid]
+        )
+        kdtree = KDTree(centroids)
+        gdf_vote_sta_res[
+            "length_accomplished_share_smoothed"
+        ] = spatial_smoothing_gaussian(
+            gdf_vote_sta_res["length_accomplished_share"].values,
+            centroids,
+            kdtree,
+            k=20,
+            bandwidth=200,
+        )
+        gdf_vote_sta_res.to_file(FOLDER_BIKE + f"paris_vote_sta_{year}_bikenet.gpkg")
 
 
 def add_length_to_poly(gdf_poly, gdf_edges):
